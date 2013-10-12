@@ -1,0 +1,61 @@
+{
+	"AppDescription": {
+		"en": "Spotify app test"
+	},
+	"AppIcon": {
+		"36x18": "tutorial.png"
+	},
+	"AppName": {
+		"en": "Spotify Test"
+	},
+	"BundleIdentifier": "rl-test",
+	"BundleType": "Application",
+	"BundleVersion": "0.1",
+	"DefaultTabs": [
+		{
+			"arguments": "rm",
+			"title": {
+				"en": "Rock/Metal"
+			}
+		},
+		{
+			"arguments": "e",
+			"title": {
+				"en": "Electronic"
+			}
+		},
+		{
+			"arguments": "hh",
+			"title": {
+				"en": "Hip Hop"
+			}
+		},
+		{
+			"arguments": "d",
+			"title": {
+				"en": "Decades"
+			}
+		},
+		{
+			"arguments": "c",
+			"title": {
+				"en": "Classical"
+			}
+		},
+		{
+			"arguments": "o",
+			"title": {
+				"en": "Other"
+			}
+		}
+	],
+	"Dependencies": {
+	    "api": "1.1.0",
+	    "views": "1.43.0"
+	},
+	"RequiredInterface": 1,
+	"SupportedLanguages": ["en"],
+	"VendorIdentifier": "co.robl",
+	"SupportedDeviceClasses": ["Desktop", "Tablet", "Mobile", "Web", "Tv"],
+	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
+}

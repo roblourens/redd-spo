@@ -1,0 +1,21 @@
+html {
+	-webkit-user-select: auto;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+}
+
+#wrapper {
+	padding: 50px;
+}
+
+.img-wrapper {
+	float: left;
+	margin-right: 20px;
+}
+
+.item {
+	min-height: 200px;
+}

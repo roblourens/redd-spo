@@ -1,0 +1,24 @@
+{
+	"rm": [
+		{
+			"name": "/r/AlternativeRock",
+			"songs": 
+			[
+				"spotify:track:1Pszgytvs7KbIP25nHcOxg",
+				"spotify:track:6RTywqde5Xnmz1fmDuommy",
+				"spotify:track:6t6oULCRS6hnI7rm0h5gwl",
+				"spotify:track:3PJikMV2xGNCooQttQrAw5"
+			]
+		},
+		{
+			"name": "/r/ClassicRock",
+			"songs": 
+			[
+				"spotify:track:4gr2Iw9NggTrGjvrurEfA6",
+				"spotify:track:4DybXOm1a5P0LnMMYaHhKL",
+				"spotify:track:2EQhNdnP2LT96NnkkKkm0N",
+				"spotify:track:51m0PrZokFZNk5b5xptyzC"
+			]
+		}
+	]
+}
