@@ -1,0 +1,19 @@
+Split by " - ", search artist: , title: both ways (?)
+	Needed for I'm not a band ...
+Wrap "-" in spaces
+	Changes results for alt-j in Spotify, not in the API
+	africa-toto gives the Best Of album
+	africa+-+toto gives the original album - why?
+	The+Zombies+-+Time+Of+The+Season is correct
+	The+Zombies-Time+Of+The+Season is Karaoke
+Strip &
+Strip ft, feat
+Remove text in ()  (unless it contains "remix", then skip)
+Remove text in []  (unless it contains "remix", then skip)
+Remove text in () and []  (unless it contains "remix", then skip)
+Remove stuff after () and [] (lots in treemusic, maybe only if they occur after the "-")
+
+
+Need some kind of check
+	title: "Follow:" url: https://soundcloud.com/doubledee-official
+	Getting downvoted...
