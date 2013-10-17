@@ -26,11 +26,13 @@
 		(-> q
 			(#(clojure.string/replace % #"-" " - "))
 			(#(clojure.string/replace % #"feat.|feat|ft.|ft|&amp;|:" ""))))
-
-	(println "searching for " q)
-	(-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
-		get-json
-		first-href))
+	(defn do-search [q]
+		(println "searching for " q)
+		(-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
+			get-json
+			first-href))
+	(if-let [results do-search]
+		results))
 
 (defn get-submissions [name]
 	"Returns the submission title/urls for a subreddit, filtering self posts"

@@ -1,3 +1,10 @@
+/* periwinkle: #9494FF, orangered: #FF8B60 
+   header: #cee3f8
+   header border: #5f99cf
+   link: #369;
+*/
+
+
 html {
 	-webkit-user-select: auto;
 }
@@ -16,6 +23,7 @@ body {
 	margin-right: 20px;
 }
 
-.item {
-	min-height: 200px;
+.subreddit {
+	min-height: 300px;
+    margin-bottom: 100px;
 }

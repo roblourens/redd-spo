@@ -11,7 +11,7 @@ Strip ft, feat
 Remove text in ()  (unless it contains "remix", then skip)
 Remove text in []  (unless it contains "remix", then skip)
 Remove text in () and []  (unless it contains "remix", then skip)
-Remove stuff after () and [] (lots in treemusic, maybe only if they occur after the "-")
+Remove stuff after () and [] (lots in treemusic, maybe only if they occur after the first "-")
 
 
 Need some kind of check
