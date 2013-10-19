@@ -31,8 +31,8 @@ function(models,        List,               Image)
     function getJson()
     {
         var p = new models.Promise();
-        $.get("http://rl-reddspo.s3-website-us-east-1.amazonaws.com/results.json", function(data) {
-            p.setDone(data);
+        $.get("http://rl-reddspo.s3-website-us-east-1.amazonaws.com/results.json?" + (new Date()).valueOf(), function(data) {
+            p.setDone(JSON.parse(data));
         });
 
         return p;
