@@ -14,8 +14,31 @@ body {
 	margin: 0;
 }
 
+#header {
+    height: 70px;
+    padding-top: 10px;
+    text-align: center;
+    background-color: #cee3f8;
+    border-bottom: rgb(68, 111, 151) 1px solid;
+    width: 100%;
+    box-shadow: 0px 0px 10px 2px #444;
+    position: relative;
+}
+
+#reddit-logo {
+    height: 50px;
+}
+
 #wrapper {
-	padding: 50px;
+}
+
+.title {
+    color: #FF8B60;
+    text-shadow: 1px 1px 0px black;
+    font-weight: bold;
+    font-size: 2.7em;
+    margin-bottom: 15px;
+    margin-left: 50px;
 }
 
 .img-wrapper {
@@ -24,6 +47,18 @@ body {
 }
 
 .subreddit {
-	min-height: 300px;
-    margin-bottom: 100px;
+    /* The container isn't sized to the image height for some reason. The bottom pad is basically controlled by min-height. */
+	min-height: 350px;
+    padding: 25px 50px 0px; 
+    background: url('../res/grid_noise.png');
+}
+
+.subreddit:nth-child(2n+1) {
+    background-color: #5f99cf;
+}
+
+.subreddit:nth-child(2n) {
+    background-color: #777;
+    box-shadow: 0px 0px 10px 2px #444;
+    position: relative;
 }

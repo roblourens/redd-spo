@@ -25,7 +25,7 @@ Subreddit.prototype.init = function(data)
 
     // Build the subreddit HTML
     var item = $($.parseHTML(
-        "<div class='subreddit'><h1 class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
+        "<div class='subreddit'><div class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
 
     // Set the sub title
     item.find('.title').text(data.name);
@@ -72,6 +72,7 @@ Subreddit.prototype.dispose = function()
     return models.Playlist.removeTemporary(this.playlist);
 };
 
+// Image.fromPlaylist for temp playlists is "not implemented", assholes
 var imgSize = 250;
 function imageForTempPlaylist(playlist, name)
 {
