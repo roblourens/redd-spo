@@ -11,11 +11,16 @@
 
 (def cred {:access-key "AKIAJKKRMAO6YBDXWITQ", :secret-key "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"})
 
+; From http://www.learningclojure.com/2010/09/defn-vs-defmacro-what-is-macro-why-is.html
+(defmacro dbg[x] `(let [x# ~x] (println "dbg:" '~x "=" x#) x#))
+
 (defn get-json [url]
 	(println "getting " url)
 	(with-open [client (http/create-client)]
 		(let [resp (http/GET client url)]
-			(-> resp http/await http/string (json/read-str :key-fn keyword)))))
+			(try
+				(-> resp http/await http/string (json/read-str :key-fn keyword))
+			(catch Exception e "")))))
 
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
@@ -28,7 +33,7 @@
 		"Add spaces around '-' and remove some unneeded things"
 		(-> q
 			(clojure.string/replace #"-" " - ")
-			(clojure.string/replace #"feat.|feat|ft.|ft|&amp;|:" "")))
+			(clojure.string/replace #" feat.| feat| ft.| ft|&amp;|:" "")))
 
 	(defn do-search [q]
 		(println "searching for " q)
@@ -59,9 +64,14 @@
 			 :url (-> submission :data :url)})
 		(map extract-bits submissions))
 
-	(-> (format "http://www.reddit.com/r/%s.json" name) 
-		get-json
-		:data :children
+	(defn assemble-submissions-rec [submissions after i]
+		(if (= i 0)
+			submissions
+			(let [url (format "http://www.reddit.com/r/%s.json%s" name (if after (format "?after=%s" after) ""))
+				  resultData (-> url get-json :data)]
+				(assemble-submissions-rec (concat submissions (resultData :children)) (resultData :after) (- i 1)))))
+
+	(-> (assemble-submissions-rec {} nil 5)
 		filter-self-posts
 		extract-all-bits))
 
@@ -81,7 +91,7 @@
 		(map resolve-subreddit cat))
 	(map-vals resolve-cat category-map))
 
-(defn get-categories-list [path]
+(defn get-categories [path]
 	(json/read-str (slurp path) :key-fn keyword))
 
 (defn write-results [results]
@@ -93,7 +103,8 @@
 
 (defn -main [& args]
 	"Do the things."
-	(println (write-results (resolve-categories (get-categories-list "subreddits.json")))))
+	(println (write-results (resolve-categories (get-categories "subreddits.json")))))
 
 ; TODO
-; Find a way to unescape &amp; etc or look for more to add manually
+; Remove () also
+; Add extra pages of results

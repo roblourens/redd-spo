@@ -14,6 +14,8 @@ Remove text in () and []  (unless it contains "remix", then skip)
 Remove stuff after () and [] (lots in treemusic, maybe only if they occur after the first "-")
 
 
-Need some kind of check
-	title: "Follow:" url: https://soundcloud.com/doubledee-official
-	Getting downvoted...
+??
+    The Flaming Lips - Yoshimi Battles the Pink Robots Pt. 1 [Official Music...
+        Unmatched [] - add [^ and (^ to regexes to remove
+        Removing this, false positive bc Spotify names the official version "Part 1"
+        Special case for stripping like feat.?
