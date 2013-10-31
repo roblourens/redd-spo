@@ -20,7 +20,7 @@
 		(let [resp (http/GET client url)]
 			(try
 				(-> resp http/await http/string (json/read-str :key-fn keyword))
-			(catch Exception e "")))))
+			(catch Exception e {})))))
 
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
