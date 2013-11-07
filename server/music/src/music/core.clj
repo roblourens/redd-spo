@@ -8,7 +8,6 @@
 
 (set! *warn-on-reflection* true)
 
-
 (def cred {:access-key "AKIAJKKRMAO6YBDXWITQ", :secret-key "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"})
 
 ; From http://www.learningclojure.com/2010/09/defn-vs-defmacro-what-is-macro-why-is.html
@@ -25,7 +24,7 @@
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
 
-(defn search-spotify [q]
+(defn resolve-submission-title [q]
 	(defn filter-non-us [d]
 		(filter #(re-matches #".*US.*" (-> % :album :availability :territories)) d))
 
@@ -38,19 +37,54 @@
 	(defn do-search [q]
 		(println "searching for " q)
 		(-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
+			clojure.string/trim
 			get-json
 			:tracks
 			filter-non-us
 			first
 			:href))
 
+	(defn remove-between-regexes-transform [r1 r2 & [e]]
+		"Removes all instances of text between r1 and r2 which doesn't inlude e (or 'remix'/'mashup'). Good enough for most cases.
+		 Returns nil when no change"
+		
+		(defn process-match [q match]
+			"Processes one substring of q as a candidate for removal.
+			Removes it if it does not contain 'remix' or 'mashup'."
+			(if (or 
+					(re-find #"(?i)remix" match)
+					(re-find #"(?i)mashup" match))
+				q
+				(clojure.string/replace q match "")))
+
+		#(reduce process-match % (re-seq (re-pattern (format "%s[^%s]*%s" r1 (if (nil? e) r2 e) r2)) %)))
+
+	(defn try-transform-rec [q transforms]
+		"todo Make this not recursive, maybe."
+		(defn continue [q']
+			"Makes the next recursive call"
+			(try-transform-rec q' (rest transforms)))
+
+		(if (> (count transforms) 0)
+			; Apply the transform - if it changed anything, search with it
+			(let [q' ((first transforms) q)]
+				(if (not= q q')
+					(if-let [results (dbg (do-search q'))]
+						results
+						(continue q'))
+					(continue q')))
+
+			; No transforms left - return nil
+			nil))
+
 	(if-let [results (do-search q)]
 		results
-		(if-let [wo-brackets-q (clojure.core/re-matches #".*\[(.*)\]" q)]
-			(if (not (clojure.core/re-matches #"(?i) remix" (nth wo-brackets-q 1)))
-				(do-search (clojure.string/replace q #"\[.*\]" ""))
-				nil)
-			nil)))
+		(try-transform-rec
+			q
+			[(remove-between-regexes-transform "\\[" "\\]")
+			 (remove-between-regexes-transform "\\(" "\\)")
+			 (remove-between-regexes-transform "\\[" "$" "\\]")
+			 (remove-between-regexes-transform "\\(" "$" "\\)")])))
 
 (defn get-submissions [name]
 	"Returns the submission title/urls for a subreddit, filtering self posts"
@@ -77,7 +111,7 @@
 
 (defn resolve-submission [submission]
 	(def title (submission :title))
-	(assoc submission :sp-uri (search-spotify title)))
+	(assoc submission :sp-uri (resolve-submission-title title)))
 
 (defn resolve-subreddit [name]
 	"Retrieves the subreddit submissions and resolves them to subreddit data ({:name altrock :tracks [...]})"
@@ -103,8 +137,4 @@
 
 (defn -main [& args]
 	"Do the things."
-	(println (write-results (resolve-categories (get-categories "subreddits.json")))))
-
-; TODO
-; Remove () also
-; Add extra pages of results
+	(write-results (resolve-categories (get-categories "subreddits.json"))))

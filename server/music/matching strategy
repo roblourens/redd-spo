@@ -12,10 +12,37 @@ Remove text in ()  (unless it contains "remix", then skip)
 Remove text in []  (unless it contains "remix", then skip)
 Remove text in () and []  (unless it contains "remix", then skip)
 Remove stuff after () and [] (lots in treemusic, maybe only if they occur after the first "-")
-
+    ("remix" or "mashup")
 
 ??
     The Flaming Lips - Yoshimi Battles the Pink Robots Pt. 1 [Official Music...
         Unmatched [] - add [^ and (^ to regexes to remove
         Removing this, false positive bc Spotify names the official version "Part 1"
         Special case for stripping like feat.?
+
+    We didn't get much love on /r/music. Let's try here. Vokadin - Pathetic (Danish band)
+        Some subreddits in particular have lots of these. A case for more aggressive splitting by punctuation marks
+
+    Bad Girl Rhythm (M.I.A. vs Amon Tobin (aka Two Fingers) [Scatt Damon Mashup]
+        "mashup" - usually title/artist will get rid of these, but there isn't a good way to ignore filtering the ()
+        Also, unmatched '('
+
+    Postcards From Far Away - Coldplay ~ Piano Cover by Moonlight Maestro ~~
+        ~ not handled anywhere yet
+
+    Post - Cold Outside. This my band's first music video, enjoy!
+        \. $
+
+    [NEW RELEASE] Arcade Fire--Afterlife
+    another example: [new] M.O.O.N. - Quixotic
+        There are not many of these. Maybe few enough to ignore it for now and just do \[ $
+        ^\[ \]
+
+    [Big Room] Tony Rockwell &amp; Artur White - Abena [Radiokid Records]
+        Both ends
+
+    Good Charlotte- The Anthem, This song is Awesome
+        Remove after ','
+
+Investigate
+    "METRIC - Synthetica (Official Video)"
