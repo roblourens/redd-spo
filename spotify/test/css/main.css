@@ -62,3 +62,7 @@ body {
     box-shadow: 0px 0px 10px 2px #444;
     position: relative;
 }
+
+.list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
+    height: 250px !important;
+}

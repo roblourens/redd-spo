@@ -16,8 +16,6 @@ function Subreddit()
 {
 }
 
-var numTracks = 9;
-
 // Returns a promise
 Subreddit.prototype.init = function(data)
 {
@@ -43,7 +41,7 @@ Subreddit.prototype.init = function(data)
             var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
 
             // Populate the playlist
-            playlist.tracks.add(tracks.slice(0, numTracks)).done(this, function()
+            playlist.tracks.add(tracks).done(this, function()
             {
                 imageForTempPlaylist(playlist, data.name).done(this, function(image)
                 {
@@ -54,7 +52,7 @@ Subreddit.prototype.init = function(data)
                 });
 
                 // Set the sub list
-                var list = List.forPlaylist(playlist, { style: 'rounded' });
+                var list = List.forPlaylist(playlist, { style: 'rounded', height: 'fixed' });
                 list.init();
                 item.find(".list-wrapper").append(list.node);
             })
@@ -81,7 +79,7 @@ function imageForTempPlaylist(playlist, name)
     playlist.tracks.snapshot(0, 4)
         .done(function(snapshot)
         {
-            var trackImgUris = $.map(snapshot._meta, function(m){ return m.image; });
+            var trackImgUris = $.map(snapshot._meta, function(m) { return m.image; });
             if (trackImgUris.length >= 4)
                 imageUri += trackImgUris.slice(0, 4).join(":");
             else if (trackImgUris.length > 0)
