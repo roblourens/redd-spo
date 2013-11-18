@@ -44,5 +44,5 @@ Remove stuff after () and [] (lots in treemusic, maybe only if they occur after 
     Good Charlotte- The Anthem, This song is Awesome
         Remove after ','
 
-Investigate
-    "METRIC - Synthetica (Official Video)"
+    Cover Up
+        Matches an artist - look for the result title as a substring in the submission? Test what this eliminates.
