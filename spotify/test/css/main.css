@@ -64,6 +64,10 @@ body {
     position: relative;
 }
 
+.list-wrapper {
+    min-height: 1px; /* When the list-wrapper doesn't take up space, there's a gap between subreddits before data is loaded */
+}
+
 .list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
     height: 250px !important;
 }
