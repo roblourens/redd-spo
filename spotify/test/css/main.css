@@ -6,12 +6,13 @@
 
 
 html {
-	-webkit-user-select: auto;
+    -webkit-user-select: auto;
 }
 
 body {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
 }
 
 #header {
@@ -42,13 +43,13 @@ body {
 }
 
 .img-wrapper {
-	float: left;
-	margin-right: 20px;
+    float: left;
+    margin-right: 20px;
 }
 
 .subreddit {
     /* The container isn't sized to the image height for some reason. The bottom pad is basically controlled by min-height. */
-	min-height: 350px;
+    min-height: 350px;
     padding: 25px 50px 0px; 
     background: url('../res/grid_noise.png');
 }

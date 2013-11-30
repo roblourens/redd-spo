@@ -5,31 +5,27 @@ require(
 function(models,        List,               Image) 
 {
 
-// Returns a promise that resolves to a subreddit
-RLViews.createSubreddit = function(data)
+function Subreddit(data)
 {
-    var s = new Subreddit();
-    return s.init(data);
-}
-
-function Subreddit()
-{
-}
-
-// Returns a promise
-Subreddit.prototype.init = function(data)
-{
-    var promise = new models.Promise();
-
     // Build the subreddit HTML
-    var item = $($.parseHTML(
+    this.element = $($.parseHTML(
         "<div class='subreddit'><div class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
 
     // Set the sub title
-    item.find('.title').text(data.name);
+    this.element.find('.title').text(data.name);
 
+    this.data = data;
+}
+
+RLViews.Subreddit = Subreddit;
+
+// Returns a promise
+Subreddit.prototype.init = function()
+{
+    var promise = new models.Promise();
+    
     // Create a temp playlist
-    models.Playlist.createTemporary(data.name.replace(/\//g, '')).done(this, function(playlist)
+    models.Playlist.createTemporary(this.data.name.replace(/\//g, '')).done(this, function(playlist)
     {
         this.playlist = playlist;
         playlist.load('tracks').done(this, function()
@@ -37,24 +33,22 @@ Subreddit.prototype.init = function(data)
             // the old tracks are always here, even calling removeTemporary...
             playlist.tracks.clear();
 
-            var trackUris = $.map(data.tracks, function(item) { return item['sp-uri']; });
+            var trackUris = $.map(this.data.tracks, function(track) { return track['sp-uri']; });
             var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
 
             // Populate the playlist
             playlist.tracks.add(tracks).done(this, function()
             {
-                imageForTempPlaylist(playlist, data.name).done(this, function(image)
+                imageForTempPlaylist(playlist, this.data.name).done(this, function(image)
                 {
-                    item.find(".img-wrapper").append(image.node);
-                    this.node = item;
-
+                    this.element.find(".img-wrapper").append(image.node);
                     promise.setDone(this);
                 });
 
                 // Set the sub list
                 var list = List.forPlaylist(playlist, { style: 'rounded', height: 'fixed' });
                 list.init();
-                item.find(".list-wrapper").append(list.node);
+                this.element.find(".list-wrapper").append(list.node);
             })
             .fail(function(){console.log('add tracks fail'); promise.setFail(); });
         })
@@ -67,7 +61,17 @@ Subreddit.prototype.init = function(data)
 
 Subreddit.prototype.dispose = function()
 {
-    return models.Playlist.removeTemporary(this.playlist);
+    // Sometimes this fails because it thinks the playlist is null
+    try
+    {
+        return models.Playlist.removeTemporary(this.playlist);
+    }
+    catch (e)
+    {
+        var p = new models.Promise();
+        p.setDone();
+        return p;
+    }
 };
 
 // Image.fromPlaylist for temp playlists is "not implemented", assholes

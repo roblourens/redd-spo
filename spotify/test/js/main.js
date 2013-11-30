@@ -8,11 +8,10 @@ function(models,        List,               Image)
 
     function drawSub(subredditData)
     {
-       RLViews.createSubreddit(subredditData).done(function(subreddit)
-       {
-            activeSubreddits.push(subreddit);
-            $('#wrapper').append(subreddit.node);
-       });
+        var subreddit = new RLViews.Subreddit(subredditData);
+        subreddit.init(); // async
+        activeSubreddits.push(subreddit);
+        $('#wrapper').append(subreddit.element);
     }
 
     function drawData(data)
@@ -31,9 +30,14 @@ function(models,        List,               Image)
     function getJson()
     {
         var p = new models.Promise();
-        $.get("http://rl-reddspo.s3-website-us-east-1.amazonaws.com/results.json?" + (new Date()).valueOf(), function(data) {
-            p.setDone(JSON.parse(data));
-        });
+        $.get(
+            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/results.json?" + (new Date()).valueOf(), 
+            function(data) {
+                if (typeof data == "string")
+                    data = JSON.parse(data);
+
+                p.setDone(data);
+            });
 
         return p;
     }
