@@ -14,10 +14,8 @@ function(models,        List,               Image)
         $('#wrapper').append(subreddit.element);
     }
 
-    function drawData(data)
+    function drawData(subreddits)
     {
-        var curTabId = models.application.arguments[models.application.arguments.length - 1];
-        var subreddits = data[curTabId];
         subreddits.forEach(drawSub);
     }
 
@@ -27,11 +25,11 @@ function(models,        List,               Image)
         return models.Promise.join($.map(activeSubreddits, function(s){ s.dispose(); }));
     }
 
-    function getJson()
+    function getCategoryJson(tabId)
     {
         var p = new models.Promise();
         $.get(
-            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/results.json?" + (new Date()).valueOf(), 
+            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + (new Date()).valueOf(), // spotify cache??
             function(data) {
                 if (typeof data == "string")
                     data = JSON.parse(data);
@@ -43,19 +41,19 @@ function(models,        List,               Image)
     }
 
     // For now, going to wipe the page and start over whenever refreshing. Maybe have a better refresh scheme later
-    function drawTab()
+    function drawCurTab()
     {
-        // This actually loads data for all tabs. Maybe load one at a time later
-        models.Promise.join(getJson(), cleanUp()).done(function(results)
+        var curTabId = models.application.arguments[models.application.arguments.length - 1];
+        models.Promise.join(getCategoryJson(curTabId), cleanUp()).done(function(results)
         {
-            var data = results[0]; // from getJson
+            var data = results[0]; // from getCategoryJson
             drawData(data);
         });
     }
 
     models.application.load('arguments').done(
         function() {
-        	drawTab();
-            models.application.addEventListener('arguments', drawTab);
+        	drawCurTab();
+            models.application.addEventListener('arguments', drawCurTab);
         });
 });

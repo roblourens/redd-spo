@@ -13,10 +13,11 @@
 
 (defn write-results [results]
 	"results are {:rm [list of subreddit data ...] ...}"
-	(let [results-json (json/write-str results)]
-		(s3/put-object cred "rl-reddspo" "results.json" results-json {:content-type "application/json"})
-		(s3/update-object-acl cred "rl-reddspo" "results.json" (s3/grant :all-users :read))
-		(spit "results.json" results-json)))
+	(doseq [[cat cat-results] results]
+		(let [cat-results-json (json/write-str cat-results)
+			  objectname (str (name cat) ".json")]
+			(s3/put-object cred "rl-reddspo" objectname cat-results-json {:content-type "application/json"})
+			(s3/update-object-acl cred "rl-reddspo" objectname (s3/grant :all-users :read)))))
 
 (defn get-submissions [name]
 	"Returns the submission title/urls for a subreddit, filtering self posts"
@@ -60,4 +61,5 @@
 
 (defn -main [& args]
 	"Do the things."
+	; todo - write each category as it is completed and release memory
 	(write-results (resolve-categories (util/json-from-file "subreddits.json"))))
