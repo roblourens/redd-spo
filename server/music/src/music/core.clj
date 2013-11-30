@@ -14,7 +14,7 @@
 (defn write-results [results]
 	"results are {:rm [list of subreddit data ...] ...}"
 	(let [results-json (json/write-str results)]
-		(s3/put-object cred "rl-reddspo" "results.json" results-json)
+		(s3/put-object cred "rl-reddspo" "results.json" results-json {:content-type "application/json"})
 		(s3/update-object-acl cred "rl-reddspo" "results.json" (s3/grant :all-users :read))
 		(spit "results.json" results-json)))
 
@@ -52,7 +52,7 @@
 	 :tracks (map resolve-submission (get-submissions name))})
 
 (defn resolve-subreddit-list [l]
-	"Resolve a category ([altrock ...]) to a list of subreddit data"
+	"Resolve a subreddit list ([altrock ...]) to a list of subreddit data"
 	(map resolve-subreddit l))
 
 (defn resolve-categories [category-map]
