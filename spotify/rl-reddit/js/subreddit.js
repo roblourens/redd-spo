@@ -34,6 +34,7 @@ Subreddit.prototype.init = function()
             playlist.tracks.clear();
 
             var trackUris = $.map(this.data.tracks, function(track) { return track['sp-uri']; });
+            trackUris = trackUris.slice(0, 9); // Limit to 9 visible tracks
             var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
 
             // Populate the playlist
@@ -46,7 +47,7 @@ Subreddit.prototype.init = function()
                 });
 
                 // Set the sub list
-                var list = List.forPlaylist(playlist, { style: 'rounded', height: 'fixed' });
+                var list = List.forPlaylist(playlist, { style: 'rounded' });
                 list.init();
                 this.element.find(".list-wrapper").append(list.node);
             })
