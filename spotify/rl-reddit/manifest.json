@@ -1,14 +1,14 @@
 {
 	"AppDescription": {
-		"en": "Spotify app test"
+		"en": "Music from genre subreddits in Spotify!"
 	},
 	"AppIcon": {
 		"36x18": "tutorial.png"
 	},
 	"AppName": {
-		"en": "Spotify Test"
+		"en": "Reddit Tunes"
 	},
-	"BundleIdentifier": "rl-test",
+	"BundleIdentifier": "rl-reddit",
 	"BundleType": "Application",
 	"BundleVersion": "0.1",
 	"DefaultTabs": [
