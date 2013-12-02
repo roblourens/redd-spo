@@ -9,7 +9,6 @@ function(models,        List,               Image)
 
     function drawSub(subredditData)
     {
-        log('drawSub');
         var subreddit = new RLViews.Subreddit(subredditData);
         var initPromise = subreddit.init();
 
@@ -46,7 +45,6 @@ function(models,        List,               Image)
             "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + (new Date()).valueOf(), // spotify cache??
             function(data)
             {
-                log('GET complete');
                 if (typeof data == "string")
                     data = JSON.parse(data);
 
@@ -60,7 +58,6 @@ function(models,        List,               Image)
     function drawCurTab()
     {
         NProgress.start();
-        resetPerf();
 
         setTimeout(function()
         {
