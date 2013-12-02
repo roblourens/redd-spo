@@ -5,11 +5,18 @@ require(
 function(models,        List,               Image) 
 {
     var activeSubreddits = [];
+    var loadingSubredditPromises = [];
 
     function drawSub(subredditData)
     {
+        log('drawSub');
         var subreddit = new RLViews.Subreddit(subredditData);
-        subreddit.init(); // async
+        var initPromise = subreddit.init();
+
+        // Assume any past the 4th won't be visible at first, so don't need to track those promises
+        if (loadingSubredditPromises.length < 4)
+            loadingSubredditPromises.push(initPromise);
+
         activeSubreddits.push(subreddit);
         $('#wrapper').append(subreddit.element);
     }
@@ -17,6 +24,13 @@ function(models,        List,               Image)
     function drawData(subreddits)
     {
         subreddits.forEach(drawSub);
+        models.Promise.join(loadingSubredditPromises).always(function()
+        {
+            loadingSubredditPromises = [];
+
+            // Give everything a chance to finish being drawn, then kill the progress indicator
+            setTimeout(function() { NProgress.done(); }, 0)
+        });
     }
 
     function cleanUp()
@@ -30,7 +44,9 @@ function(models,        List,               Image)
         var p = new models.Promise();
         $.get(
             "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + (new Date()).valueOf(), // spotify cache??
-            function(data) {
+            function(data)
+            {
+                log('GET complete');
                 if (typeof data == "string")
                     data = JSON.parse(data);
 
@@ -43,12 +59,18 @@ function(models,        List,               Image)
     // For now, going to wipe the page and start over whenever refreshing. Maybe have a better refresh scheme later
     function drawCurTab()
     {
-        var curTabId = models.application.arguments[models.application.arguments.length - 1];
-        models.Promise.join(getCategoryJson(curTabId), cleanUp()).done(function(results)
+        NProgress.start();
+        resetPerf();
+
+        setTimeout(function()
         {
-            var data = results[0]; // from getCategoryJson
-            drawData(data);
-        });
+            var curTabId = models.application.arguments[models.application.arguments.length - 1];
+            models.Promise.join(getCategoryJson(curTabId), cleanUp()).done(function(results)
+            {
+                var data = results[0]; // from getCategoryJson
+                drawData(data);
+            });    
+        }, 0);
     }
 
     models.application.load('arguments').done(

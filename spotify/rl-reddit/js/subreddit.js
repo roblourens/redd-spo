@@ -24,12 +24,16 @@ Subreddit.prototype.init = function()
 {
     var promise = new models.Promise();
     
-    // Create a temp playlist
+    // Now entering callback hell
     models.Playlist.createTemporary(this.data.name.replace(/\//g, '')).done(this, function(playlist)
     {
+        this.log('createTemporary done');
+
         this.playlist = playlist;
         playlist.load('tracks').done(this, function()
         {
+            this.log('tracks loaded');
+
             // the old tracks are always here, even calling removeTemporary...
             playlist.tracks.clear();
 
@@ -40,8 +44,10 @@ Subreddit.prototype.init = function()
             // Populate the playlist
             playlist.tracks.add(tracks).done(this, function()
             {
+                this.log('tracks added');
                 imageForTempPlaylist(playlist, this.data.name).done(this, function(image)
                 {
+                    this.log('image created');
                     this.element.find(".img-wrapper").append(image.node);
                     promise.setDone(this);
                 });
@@ -59,6 +65,11 @@ Subreddit.prototype.init = function()
 
     return promise;
 };
+
+Subreddit.prototype.log = function(msg)
+{
+    log(this.data.name + ": " + msg);
+}
 
 Subreddit.prototype.dispose = function()
 {
