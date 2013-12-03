@@ -38,20 +38,6 @@ function(models,        List,               Image)
         return models.Promise.join($.map(activeSubreddits, function(s){ s.dispose(); }));
     }
 
-    function getCategoryJson(tabId)
-    {
-        var p = new models.Promise();
-        $.get(
-            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + timeMs(), // spotify cache??
-            function(data)
-            {
-                if (typeof data == "string") data = JSON.parse(data);
-
-                p.setDone(data);
-            });
-
-        return p;
-    }
 
     // For now, going to wipe the page and start over whenever refreshing. Maybe have a better refresh scheme later
     function drawCurTab()
@@ -62,7 +48,7 @@ function(models,        List,               Image)
         setTimeout(function()
         {
             var tabIdToDraw = curTabId();
-            models.Promise.join(getCategoryJson(tabIdToDraw), cleanUp()).done(function(results)
+            models.Promise.join(Data.getCategoryJson(tabIdToDraw), cleanUp()).done(function(results)
             {
                 // Maybe the tab changed
                 if (tabIdToDraw != curTabId()) return;
