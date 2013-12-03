@@ -45,8 +45,10 @@ function(models,        List,               Image)
             "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + (new Date()).valueOf(), // spotify cache??
             function(data)
             {
-                if (typeof data == "string")
-                    data = JSON.parse(data);
+                // Maybe the tab changed while GETting
+                if (tabId != curTabId()) return;
+
+                if (typeof data == "string") data = JSON.parse(data);
 
                 p.setDone(data);
             });
@@ -57,17 +59,22 @@ function(models,        List,               Image)
     // For now, going to wipe the page and start over whenever refreshing. Maybe have a better refresh scheme later
     function drawCurTab()
     {
+        NProgress.set(0, true);
         NProgress.start();
 
         setTimeout(function()
         {
-            var curTabId = models.application.arguments[models.application.arguments.length - 1];
-            models.Promise.join(getCategoryJson(curTabId), cleanUp()).done(function(results)
+            models.Promise.join(getCategoryJson(curTabId()), cleanUp()).done(function(results)
             {
                 var data = results[0]; // from getCategoryJson
                 drawData(data);
             });    
         }, 0);
+    }
+
+    function curTabId()
+    {
+        return models.application.arguments[models.application.arguments.length - 1];
     }
 
     models.application.load('arguments').done(

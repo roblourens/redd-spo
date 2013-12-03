@@ -49,9 +49,10 @@
    *
    *     NProgress.set(0.4);
    *     NProgress.set(1.0);
+   *
+   * If the second argument is true, wipe the current queue and force the new value to be immediately enqueued
    */
-
-  NProgress.set = function(n) {
+  NProgress.set = function(n, force) {
     var started = NProgress.isStarted();
 
     n = clamp(n, Settings.minimum, 1);
@@ -63,6 +64,11 @@
         ease      = Settings.easing;
 
     $progress[0].offsetWidth; /* Repaint */
+
+    if (force)
+    {
+      $progress.queue([]);
+    }
 
     $progress.queue(function(next) {
       // Set positionUsing if it hasn't already been set
