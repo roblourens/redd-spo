@@ -42,12 +42,9 @@ function(models,        List,               Image)
     {
         var p = new models.Promise();
         $.get(
-            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + (new Date()).valueOf(), // spotify cache??
+            "http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + timeMs(), // spotify cache??
             function(data)
             {
-                // Maybe the tab changed while GETting
-                if (tabId != curTabId()) return;
-
                 if (typeof data == "string") data = JSON.parse(data);
 
                 p.setDone(data);
@@ -64,8 +61,11 @@ function(models,        List,               Image)
 
         setTimeout(function()
         {
-            models.Promise.join(getCategoryJson(curTabId()), cleanUp()).done(function(results)
+            var tabIdToDraw = curTabId();
+            models.Promise.join(getCategoryJson(tabIdToDraw), cleanUp()).done(function(results)
             {
+                // Maybe the tab changed
+                if (tabIdToDraw != curTabId()) return;
                 var data = results[0]; // from getCategoryJson
                 drawData(data);
             });    
