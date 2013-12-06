@@ -1,4 +1,4 @@
-RLViews = {};
+"use strict";
 
 require(
        ['$api/models', '$views/list#List', '$views/image#Image'],
