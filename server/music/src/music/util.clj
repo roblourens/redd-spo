@@ -15,7 +15,7 @@
             (catch Exception e {})))))
 
 (defn map-vals [f m]
-  (into {} (for [[k v] m] [k (f v)])))
+    (into {} (for [[k v] m] [k (f v)])))
 
 (defn json-from-file [path]
     (json/read-str (slurp path) :key-fn keyword))

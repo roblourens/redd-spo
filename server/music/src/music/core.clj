@@ -11,13 +11,38 @@
 
 (def cred {:access-key "AKIAJKKRMAO6YBDXWITQ", :secret-key "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"})
 
+(defn submit-object [objectname json-object]
+	; Add the json stringify the object and send to s3 with correct content-type
+	(s3/put-object
+		cred
+		"rl-reddspo"
+		objectname
+		(json/write-str json-object)
+		{:content-type "application/json"})
+
+	; Set permissions on the object
+	(s3/update-object-acl
+		cred
+		"rl-reddspo"
+		objectname
+		(s3/grant :all-users :read)))
+
+(defn clean-results [subreddits]
+	"Turn a lot of data into just the necessary Spotify URIs"
+	(defn extract-sp-uris [subreddit]
+		(assoc subreddit :tracks
+			; Extract sp-uri values from the track map and filter out nils
+			(filter #(not (nil? %)) 
+				(map #(% :sp-uri) (subreddit :tracks)))))
+	(map extract-sp-uris subreddits))
+
 (defn write-results [results]
 	"results are {:rm [list of subreddit data ...] ...}"
-	(doseq [[cat cat-results] results]
-		(let [cat-results-json (json/write-str cat-results)
-			  objectname (str (name cat) ".json")]
-			(s3/put-object cred "rl-reddspo" objectname cat-results-json {:content-type "application/json"})
-			(s3/update-object-acl cred "rl-reddspo" objectname (s3/grant :all-users :read)))))
+	(doseq [[cat subreddits] results]
+		(let [objectname (str (name cat) ".json")
+			  dbgobjectname (str "dbg-" objectname)]
+			(submit-object dbgobjectname subreddits)
+			(submit-object objectname (clean-results subreddits)))))
 
 (defn get-submissions [name]
 	"Returns the submission title/urls for a subreddit, filtering self posts"

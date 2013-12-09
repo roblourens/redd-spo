@@ -12,7 +12,10 @@
         (-> q
             clojure.string/trim
             (clojure.string/replace #"-" " - ")
-            (clojure.string/replace #" feat.| feat| ft.| ft|&amp;|:" "")))
+            (clojure.string/replace #" feat.| feat| ft.| ft|&amp;|:" "")
+
+            ; Remove numbers 1900-2019. Likely years
+            (clojure.string/replace #"19[0-9][0-9]|20[0-1][0-9]" "")))
 
 (defn- do-search [q]
     (println "searching for " q)
