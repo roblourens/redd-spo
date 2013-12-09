@@ -3,7 +3,7 @@
 		"en": "Music from genre subreddits in Spotify!"
 	},
 	"AppIcon": {
-		"36x18": "tutorial.png"
+		"36x18": "res/reddit_icon.png"
 	},
 	"AppName": {
 		"en": "Reddit Tunes"

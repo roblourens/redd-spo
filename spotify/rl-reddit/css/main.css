@@ -14,7 +14,7 @@ body {
     padding: 0;
     margin: 0;
     overflow-y: scroll;
-    min-width: 760px;
+    min-width: 700px;
 }
 
 #header {
@@ -47,6 +47,8 @@ body {
 .img-wrapper {
     float: left;
     margin-right: 20px;
+    width: 250px;
+    height: 250px;
 }
 
 .subreddit {
@@ -75,5 +77,5 @@ body {
 }
 
 .list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
-    height: 249px !important;
+    height: 249px !important; /* Get rid of that weird shadow at the bottom */
 }

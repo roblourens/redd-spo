@@ -1,8 +1,8 @@
 "use strict";
 
 require(
-       ['$api/models', '$views/list#List', '$views/image#Image'],
-function(models,        List,               Image) 
+       ['$api/models', '$views/list#List', '$views/image#Image', '$views/buttons#PlayButton'],
+function(models,        List,               Image,                PlayButton) 
 {
 
 function Subreddit(data)
@@ -11,10 +11,11 @@ function Subreddit(data)
     this.element = $($.parseHTML(
         "<div class='subreddit'><div class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
 
-    // Set the sub title
-    this.element.find('.title').text(data.name);
+    this.tracks = data.tracks;
+    this.name = data.name;
 
-    this.data = data;
+    // Set the sub title
+    this.element.find('.title').text(this.name);
 }
 
 RLViews.Subreddit = Subreddit;
@@ -25,7 +26,7 @@ Subreddit.prototype.init = function()
     var promise = new models.Promise();
     
     // Now entering callback hell
-    models.Playlist.createTemporary(this.data.name.replace(/\//g, '')).done(this, function(playlist)
+    models.Playlist.createTemporary(this.name.replace(/\//g, '')).done(this, function(playlist)
     {
         this.playlist = playlist;
         playlist.load('tracks').done(this, function()
@@ -33,14 +34,14 @@ Subreddit.prototype.init = function()
             // the old tracks are always here, even calling removeTemporary...
             playlist.tracks.clear();
 
-            var trackUris = $.map(this.data.tracks, function(track) { return track['sp-uri']; });
+            var trackUris = $.grep(this.tracks, function(uri) { return uri != null; });
             trackUris = trackUris.slice(0, 9); // Limit to 9 visible tracks
             var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
 
             // Populate the playlist
             playlist.tracks.add(tracks).done(this, function()
             {
-                imageForTempPlaylist(playlist, this.data.name).done(this, function(image)
+                imageForTempPlaylist(playlist, this.name).done(this, function(image)
                 {
                     this.element.find(".img-wrapper").append(image.node);
                     promise.setDone(this);
@@ -75,10 +76,13 @@ Subreddit.prototype.dispose = function()
     }
 };
 
-// Image.fromPlaylist for temp playlists is "not implemented", assholes
 var imgSize = 250;
 function imageForTempPlaylist(playlist, name)
 {
+    // Create player button
+    var playButton = PlayButton.forItem(playlist);
+
+    // Create image
     var imageUri = "spotify:mosaic:";
     var promise = new models.Promise();
     playlist.tracks.snapshot(0, 4)
@@ -92,9 +96,7 @@ function imageForTempPlaylist(playlist, name)
 
             imageUri = imageUri.replace(/spotify:image:/g, '');
 
-            // player won't work here because this image is created from a uri instead of a playlist.
-            // maybe can hack around it - create 2 images, extract the image part of one and insert in the DOM of the playlist one.
-            promise.setDone(Image.fromSource(imageUri, { player: true, width: imgSize, height: imgSize, overlay: [name] }));
+            promise.setDone(Image.fromSource(imageUri, { player: true, width: imgSize, height: imgSize, overlay: [name], playerItem: playlist }));
         })
         .fail(function() {
             promise.setFail("Snapshot failed");
