@@ -55,7 +55,7 @@
 	},
 	"RequiredInterface": 1,
 	"SupportedLanguages": ["en"],
-	"VendorIdentifier": "co.robl",
+	"VendorIdentifier": "com.robl",
 	"SupportedDeviceClasses": ["Desktop", "Tablet", "Mobile", "Web", "Tv"],
 	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
 }
