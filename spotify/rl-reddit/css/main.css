@@ -81,7 +81,7 @@ body {
     height: 249px !important; /* Get rid of that weird shadow at the bottom */
 }
 
-#offlineMsg {
+#connectErrMsg {
     width: 100%;
     height: 100%;
     padding: 20px;

@@ -6,7 +6,7 @@ function(models,        List,               Image)
 {
     var categories = {};
     var tabContentSelector = "#wrapper";
-    var offlineMsgSelector = "#offlineMsg";
+    var connectErrMsgSelector = "#connectErrMsg";
     var activeCategory;
 
     function cleanUp()
@@ -19,17 +19,28 @@ function(models,        List,               Image)
         if (!models.session.online) return;
 
         cleanUp();
-        var tabIdToDraw = curTabId();
 
-        activeCategory = categories[tabIdToDraw];
-        if (!activeCategory)
+        var tabIdToDraw = curTabId();
+        var selectedCategory = categories[tabIdToDraw];
+        if (!selectedCategory)
         {
-            activeCategory = new Category(tabIdToDraw);
-            categories[tabIdToDraw] = activeCategory;
-            $(tabContentSelector).append(activeCategory.element);
+            selectedCategory = new RLViews.Category(tabIdToDraw);
+            categories[tabIdToDraw] = selectedCategory;
+            $(tabContentSelector).append(selectedCategory.element);
         }
 
-        activeCategory.show();
+        activeCategory = selectedCategory;
+        selectedCategory.show()
+            .done(function()
+            {
+                hideConnectError();
+            })
+            .fail(function()
+            {
+                if (selectedCategory != activeCategory) return;
+
+                showConnectError();
+            });
     }
 
     function curTabId()
@@ -37,20 +48,27 @@ function(models,        List,               Image)
         return models.application.arguments[models.application.arguments.length - 1];
     }
 
+    function hideConnectError()
+    {
+        $(connectErrMsgSelector).hide();
+        $(tabContentSelector).show();
+    }
+
+    function showConnectError()
+    {
+        $(tabContentSelector).hide();
+        $(connectErrMsgSelector).show();
+    }
+
     function checkOnline()
     {
         if (models.session.online)
         {
-            $(offlineMsgSelector).hide();
-            $(tabContentSelector).show();
-
+            hideConnectError();
             drawCurTab();
         }
         else
-        {
-            $(tabContentSelector).hide();
-            $(offlineMsgSelector).show();
-        }
+            showConnectError();
     }
 
     models.Promise.join(
