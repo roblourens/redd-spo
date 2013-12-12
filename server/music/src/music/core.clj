@@ -61,9 +61,9 @@
 			submissions
 			(let [url (format "http://www.reddit.com/r/%s.json%s" name (if after (format "?after=%s" after) ""))
 				  resultData (-> url util/get-json :data)]
-				(assemble-submissions-rec (concat submissions (resultData :children)) (resultData :after) (- i 1)))))
+				(assemble-submissions-rec (concat submissions (:children resultData)) (:after resultData) (- i 1)))))
 
-	(-> (assemble-submissions-rec {} nil 5)
+	(-> (assemble-submissions-rec () nil 5)
 		filter-self-posts
 		extract-all-bits))
 
