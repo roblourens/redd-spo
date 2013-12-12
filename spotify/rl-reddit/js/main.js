@@ -6,6 +6,7 @@ function(models,        List,               Image)
 {
     var categories = {};
     var tabContentSelector = "#wrapper";
+    var offlineMsgSelector = "#offlineMsg";
     var activeCategory;
 
     function cleanUp()
@@ -13,9 +14,10 @@ function(models,        List,               Image)
         if (activeCategory) activeCategory.hide();
     }
 
-    // For now, going to wipe the page and start over whenever refreshing. Maybe have a better refresh scheme later
     function drawCurTab()
     {
+        if (!models.session.online) return;
+
         cleanUp();
         var tabIdToDraw = curTabId();
 
@@ -35,9 +37,30 @@ function(models,        List,               Image)
         return models.application.arguments[models.application.arguments.length - 1];
     }
 
-    models.application.load('arguments').done(
-        function() {
-        	drawCurTab();
-            models.application.addEventListener('arguments', drawCurTab.bind(this));
-        });
+    function checkOnline()
+    {
+        if (models.session.online)
+        {
+            $(offlineMsgSelector).hide();
+            $(tabContentSelector).show();
+
+            drawCurTab();
+        }
+        else
+        {
+            $(tabContentSelector).hide();
+            $(offlineMsgSelector).show();
+        }
+    }
+
+    models.Promise.join(
+        models.application.load('arguments'),
+        models.session.load('online'))
+    .done(function() {
+        checkOnline();
+
+        // Listen to tab change and online/offline events
+        models.application.addEventListener('arguments', drawCurTab.bind(this));
+        models.session.addEventListener('change:online', checkOnline.bind(this));
+    });
 });

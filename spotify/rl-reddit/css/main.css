@@ -80,3 +80,19 @@ body {
 .list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
     height: 249px !important; /* Get rid of that weird shadow at the bottom */
 }
+
+#offlineMsg {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 30px;
+
+    text-align: center;
+    font-size: 50px;
+    font-family: helvetica;
+    font-weight: bold;
+    color: #cee3f8;
+    text-shadow: 1px 1px black;
+    display: none;
+}
