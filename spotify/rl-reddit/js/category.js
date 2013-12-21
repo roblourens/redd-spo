@@ -25,8 +25,8 @@ function(models)
         {
             NProgress.set(0, true);
             NProgress.start();
-
-            // todo errors
+            this.element.empty();
+            
             Data.getCategoryJson(this.id)
             .done((function(subreddits)
             {
@@ -47,6 +47,7 @@ function(models)
         else
         {
             p.setDone();
+            NProgress.done();
         }
 
         this.element.show();
@@ -65,7 +66,8 @@ function(models)
         var subreddit = new RLViews.Subreddit(subredditData);
         subreddit.init();
 
-        this.element.append(subreddit.element);
+        if (subreddit.tracks.length > 0)
+            this.element.append(subreddit.element);
     }
 
     Category.prototype.needsRendering = function()

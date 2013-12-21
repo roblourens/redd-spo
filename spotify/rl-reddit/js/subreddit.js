@@ -11,7 +11,7 @@ function Subreddit(data)
     this.element = $($.parseHTML(
         "<div class='subreddit'><div class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
 
-    this.tracks = data.tracks;
+    this.tracks = data.tracks || [];
     this.name = data.name;
 
     // Set the sub title
@@ -98,7 +98,8 @@ function imageForTempPlaylist(playlist, name)
 
             promise.setDone(Image.fromSource(imageUri, { player: true, width: imgSize, height: imgSize, overlay: [name], playerItem: playlist }));
         })
-        .fail(function() {
+        .fail(function()
+        {
             promise.setFail("Snapshot failed");
         });
 
