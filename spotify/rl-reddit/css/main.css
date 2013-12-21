@@ -4,9 +4,11 @@
    link: #369;
 */
 
+* {
+    -webkit-user-drag: none;
+}
 
 html {
-    -webkit-user-select: auto;
     background-color: #5f99cf;
 }
 
