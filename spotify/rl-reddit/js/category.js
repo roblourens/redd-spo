@@ -23,8 +23,6 @@ function(models)
         var p = new models.Promise();
         if (this.needsRendering())
         {
-            NProgress.set(0, true);
-            NProgress.start();
             this.element.empty();
             
             Data.getCategoryJson(this.id)
@@ -34,11 +32,6 @@ function(models)
                 p.setDone();
                 this.timeRendered = timeMs();
             }).bind(this))
-            .always((function()
-            {
-                if (this.shown)
-                    NProgress.done();
-            }).bind(this))
             .fail((function()
             {
                 p.setFail('net');
@@ -47,7 +40,6 @@ function(models)
         else
         {
             p.setDone();
-            NProgress.done();
         }
 
         this.element.show();
