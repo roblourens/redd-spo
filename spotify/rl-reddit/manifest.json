@@ -3,14 +3,16 @@
 		"en": "Music from genre subreddits in Spotify!"
 	},
 	"AppIcon": {
-		"36x18": "res/reddit_icon.png"
+		"36x18": "res/reddit_icon.png",
+		"64x64": "res/icon-64.png",
+		"128x128": "res/icon-128.png"
 	},
 	"AppName": {
 		"en": "Reddit Tunes"
 	},
 	"BundleIdentifier": "rl-reddit",
 	"BundleType": "Application",
-	"BundleVersion": "0.1",
+	"BundleVersion": "1.0.0",
 	"DefaultTabs": [
 		{
 			"arguments": "rm",
@@ -56,6 +58,6 @@
 	"RequiredInterface": 1,
 	"SupportedLanguages": ["en"],
 	"VendorIdentifier": "com.robl",
-	"SupportedDeviceClasses": ["Desktop", "Tablet", "Mobile", "Web", "Tv"],
+	"SupportedDeviceClasses": ["Desktop"],
 	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
 }
