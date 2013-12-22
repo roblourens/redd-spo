@@ -42,13 +42,21 @@ body {
     height: 400px;
 }
 
+.subreddit-header {
+    margin-bottom: 10px;
+    margin-left: 50px;
+}
+
 .title {
     color: #FF8B60;
     text-shadow: 1px 1px 0px black;
     font-weight: bold;
     font-size: 2.9em;
-    margin-bottom: 10px;
-    margin-left: 50px;
+}
+
+.subreddit-header button {
+    float: right;
+    margin-top: 12px;
 }
 
 .img-wrapper {

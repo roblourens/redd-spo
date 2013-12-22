@@ -33,7 +33,7 @@ function(models, Throbber)
                     subreddits.forEach(this.renderSubreddit.bind(this));
                     p.setDone();
 
-                    this.timeRendered = timeMs();
+                    this.timeRendered = Util.timeMs();
                 }).bind(this))
                 .fail((function()
                 {
@@ -81,6 +81,6 @@ function(models, Throbber)
 
     Category.prototype.needsRendering = function()
     {
-        return timeMs() - this.timeRendered > 30*60*1000; // 30 min
+        return Util.timeMs() - this.timeRendered > 30*60*1000; // 30 min
     }
 });

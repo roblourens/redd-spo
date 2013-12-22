@@ -1,21 +1,27 @@
 "use strict";
 
 require(
-       ['$api/models', '$views/list#List', '$views/image#Image', '$views/buttons#PlayButton'],
-function(models,        List,               Image,                PlayButton) 
+       ['$api/models', '$api/library#Library', '$views/list#List', '$views/image#Image', '$views/buttons#Button'],
+function(models,        Library,                List,               Image,                Button)
 {
 
 function Subreddit(data)
 {
     // Build the subreddit HTML
     this.element = $($.parseHTML(
-        "<div class='subreddit'><div class='title' /><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
+        "<div class='subreddit'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"));
 
     this.tracks = data.tracks || [];
     this.name = data.name;
 
     // Set the sub title
     this.element.find('.title').text(this.name);
+
+    // Set up the Save as Playlist button
+    this.addButton = Button.withLabel("Add as Playlist");
+    this.addButton.setIcon("res/add.png");
+    this.element.find('.subreddit-header').append(this.addButton.node);
+    $(this.addButton.node).click(this.playlistButtonClicked.bind(this));
 }
 
 RLViews.Subreddit = Subreddit;
@@ -26,39 +32,43 @@ Subreddit.prototype.init = function()
     var promise = new models.Promise();
     
     // Now entering callback hell
-    models.Playlist.createTemporary(this.name.replace(/\//g, '')).done(this, function(playlist)
-    {
-        this.playlist = playlist;
-        playlist.load('tracks').done(this, function()
+    var trackUris = $.grep(this.tracks, function(uri) { return uri != null; });
+    trackUris = trackUris.slice(0, 9); // Limit to 9 visible tracks
+    var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
+
+    Util.playlistWithTracks(this.name.replace(/\//g, ''), tracks, true).done(
+        this,
+        function(playlist)
         {
-            // the old tracks are always here, even calling removeTemporary...
-            playlist.tracks.clear();
-
-            var trackUris = $.grep(this.tracks, function(uri) { return uri != null; });
-            trackUris = trackUris.slice(0, 9); // Limit to 9 visible tracks
-            var tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track));
-
-            // Populate the playlist
-            playlist.tracks.add(tracks).done(this, function()
+            this.playlist = playlist;
+            imageForTempPlaylist(playlist, this.name).done(this, function(image)
             {
-                imageForTempPlaylist(playlist, this.name).done(this, function(image)
-                {
-                    this.element.find(".img-wrapper").append(image.node);
-                    promise.setDone(this);
-                });
+                this.element.find(".img-wrapper").append(image.node);
 
-                // Set the sub list
-                var list = List.forPlaylist(playlist, { style: 'rounded' });
-                list.init();
-                this.element.find(".list-wrapper").append(list.node);
-            })
-            .fail(function(){console.log('add tracks fail'); promise.setFail(); });
-        })
-        .fail(function(){console.log('load "tracks" fail'); promise.setFail(); });
-    })
-    .fail(function(){console.log('create temp playlist fail'); promise.setFail(); });
+                promise.setDone(this);
+            });
+
+            // Set the sub list
+            var list = List.forPlaylist(playlist, { style: 'rounded' });
+            list.init();
+            this.element.find(".list-wrapper").append(list.node);
+        });
 
     return promise;
+};
+
+Subreddit.prototype.playlistButtonClicked = function()
+{
+    if (this.playlist)
+    {
+        this.addButton.setLabel('Added as playlist');
+        this.addButton.setIcon(null);
+        this.addButton.setDisabled(true);
+        this.playlist.tracks.snapshot().done(this, function(snapshot)
+        {
+            Util.playlistWithTracks(this.name, snapshot.toArray());
+        });
+    }
 };
 
 Subreddit.prototype.dispose = function()
@@ -79,9 +89,6 @@ Subreddit.prototype.dispose = function()
 var imgSize = 250;
 function imageForTempPlaylist(playlist, name)
 {
-    // Create player button
-    var playButton = PlayButton.forItem(playlist);
-
     // Create image
     var imageUri = "spotify:mosaic:";
     var promise = new models.Promise();
