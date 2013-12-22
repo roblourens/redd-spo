@@ -38,6 +38,10 @@ body {
 #wrapper {
 }
 
+.category {
+    height: 400px;
+}
+
 .title {
     color: #FF8B60;
     text-shadow: 1px 1px 0px black;

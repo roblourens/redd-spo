@@ -1,8 +1,8 @@
 "use strict";
 
 require(
-       ['$api/models'],
-function(models)
+       ['$api/models', '$views/throbber#Throbber'],
+function(models, Throbber)
 {
     function Category(id)
     {
@@ -11,7 +11,7 @@ function(models)
         this.shown = false;
 
         this.element = $(document.createElement('div'));
-        this.element.addClass("category-" + id);
+        this.element.addClass("category category-" + id);
     }
 
     RLViews.Category = Category;
@@ -24,18 +24,21 @@ function(models)
         if (this.needsRendering())
         {
             this.element.empty();
+            this.showLoading();
             
             Data.getCategoryJson(this.id)
-            .done((function(subreddits)
-            {
-                subreddits.forEach(this.renderSubreddit.bind(this));
-                p.setDone();
-                this.timeRendered = timeMs();
-            }).bind(this))
-            .fail((function()
-            {
-                p.setFail('net');
-            }).bind(this));
+                .done((function(subreddits)
+                {
+                    this.hideLoading();
+                    subreddits.forEach(this.renderSubreddit.bind(this));
+                    p.setDone();
+
+                    this.timeRendered = timeMs();
+                }).bind(this))
+                .fail((function()
+                {
+                    p.setFail('net');
+                }).bind(this));
         }
         else
         {
@@ -51,6 +54,20 @@ function(models)
     {
         this.element.hide();
         this.shown = false;
+    }
+
+    Category.prototype.showLoading = function() {
+        if (!this.throbber)
+        {
+            this.throbber = Throbber.forElement(this.element[0]);
+            this.throbber.setSize('small');
+        }
+
+        this.throbber.show();
+    }
+
+    Category.prototype.hideLoading = function() {
+        this.throbber.hide();
     }
 
     Category.prototype.renderSubreddit = function(subredditData)
