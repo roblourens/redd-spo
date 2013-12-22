@@ -5,7 +5,8 @@
 	"AppIcon": {
 		"36x18": "res/reddit_icon.png",
 		"64x64": "res/icon-64.png",
-		"128x128": "res/icon-128.png"
+		"128x128": "res/icon-128.png",
+		"300x300": "res/icon-300.png"
 	},
 	"AppName": {
 		"en": "Reddit Tunes"
