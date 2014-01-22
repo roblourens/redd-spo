@@ -9,7 +9,7 @@ function(models)
     {
         var p = new models.Promise();
 
-        $.get("http://rl-reddspo.s3-website-us-east-1.amazonaws.com/" + tabId + ".json?" + Util.timeMs()) // spotify cache??
+        $.get(Config.UrlBase + tabId + ".json?" + Util.timeMs()) // spotify cache??
             .done(function(data)
             {
                 if (typeof data == "string") data = JSON.parse(data);

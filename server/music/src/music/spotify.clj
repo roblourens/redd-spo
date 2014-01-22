@@ -1,5 +1,4 @@
-; _ not - because Java
-(ns music.resolve_sp
+(ns music.spotify
     (:require [music.util :as util])
     (:import [java.net URLEncoder]))
 
@@ -7,24 +6,23 @@
     "Filters non-US-allowed songs from the set of Spotify results"
     (filter #(re-matches #".*US.*" (-> % :album :availability :territories)) d))
 
+(defn- filter-karaoke-tribute [d]
+    "Filters karaoke, tribute")
+
 (defn- clean-query [q]
         "Add spaces around '-' and remove some unneeded things"
         (-> q
             clojure.string/trim
             (clojure.string/replace #"-" " - ")
-            (clojure.string/replace #" feat.| feat| ft.| ft|&amp;|:" "")
-
-            ; Remove numbers 1900-2019. Likely years
-            (clojure.string/replace #"19[0-9][0-9]|20[0-1][0-9]" "")))
+            (clojure.string/replace #" feat\.?| ft\.?| &amp;|:" "")))
 
 (defn- do-search [q]
-    (println "searching for " q)
+    (util/log (str "searching for " q))
     (-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
         util/get-json
         :tracks
         filter-non-us
-        first
-        :href))
+        first))
 
 (defn- remove-between-regexes-transform [r1 r2 & [e]]
         "Removes all instances of text between r1 and r2 which doesn't inlude e (or 'remix'/'mashup'). Good enough for most cases.
@@ -32,7 +30,7 @@
         (defn process-match [q match]
             "Processes one substring of q as a candidate for removal.
             Removes it if it does not contain 'remix' or 'mashup'."
-            (if (or 
+            (if (or
                     (re-find #"(?i)remix" match)
                     (re-find #"(?i)mashup" match))
                 q
@@ -58,7 +56,7 @@
         nil))
 
 (defn resolve-submission-title [q]
-    "Resolves a submission title query to a Spotify item id"
+    "Resolves a submission title query to a Spotify result object"
     (if-let [results (do-search q)]
         results
         (try-transform-rec
@@ -66,4 +64,12 @@
             [(remove-between-regexes-transform "\\[" "\\]")
              (remove-between-regexes-transform "\\(" "\\)")
              (remove-between-regexes-transform "\\[" "$" "\\]")
-             (remove-between-regexes-transform "\\(" "$" "\\)")])))
+             (remove-between-regexes-transform "\\(" "$" "\\)")
+             ; Remove numbers 1900-2019. Likely years
+             #(clojure.string/replace % #"19[0-9][0-9]|20[0-1][0-9]" "")])))
+
+(defn resolve-submission-title-to-id [q]
+    "Resolves a submission title query to a Spotify item id"
+    (map 
+        #(% :href)
+        (resolve-submission-title q)))

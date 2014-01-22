@@ -18,8 +18,9 @@ function Subreddit(data)
     this.element.find('.title').text(this.name);
 
     // Set up the Save as Playlist button
-    this.addButton = Button.withLabel("Add as Playlist");
+    this.addButton = Button.withLabel("Save as Playlist");
     this.addButton.setIcon("res/add.png");
+    this.addButton.setAccentuated(true);
     this.element.find('.subreddit-header').append(this.addButton.node);
     $(this.addButton.node).click(this.playlistButtonClicked.bind(this));
 }
@@ -61,7 +62,7 @@ Subreddit.prototype.playlistButtonClicked = function()
 {
     if (this.playlist)
     {
-        this.addButton.setLabel('Added as playlist');
+        this.addButton.setLabel('Saved as playlist');
         this.addButton.setIcon(null);
         this.addButton.setDisabled(true);
         this.playlist.tracks.snapshot().done(this, function(snapshot)

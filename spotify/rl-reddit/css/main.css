@@ -110,3 +110,13 @@ body {
     text-shadow: 1px 1px black;
     display: none;
 }
+
+.dev-label {
+    /* UNCOMMENT FOR RELEASE */
+    /* display: none; */
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: black;
+    z-index: 1;
+}

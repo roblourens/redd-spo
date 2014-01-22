@@ -13,7 +13,7 @@
 	},
 	"BundleIdentifier": "rl-reddit",
 	"BundleType": "Application",
-	"BundleVersion": "1.0.0",
+	"BundleVersion": "1.1.0",
 	"DefaultTabs": [
 		{
 			"arguments": "rm",
@@ -60,5 +60,5 @@
 	"SupportedLanguages": ["en"],
 	"VendorIdentifier": "com.robl",
 	"SupportedDeviceClasses": ["Desktop"],
-	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
+	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com", "http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
 }
