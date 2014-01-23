@@ -15,7 +15,7 @@
 		(assoc subreddit :tracks
 			; Extract sp-uri values from the track map and filter out nils
 			(filter #(not (nil? %)) 
-				(map #(% :sp-uri) ((util/dbg subreddit) :tracks)))))
+				(map #(% :sp-uri) (subreddit :tracks)))))
 	(map extract-sp-uris subreddits))
 
 (defn write-results [results]
@@ -47,5 +47,5 @@
 	"Do the things."
 	(-> "subreddits.json"
 		util/json-from-file
-		write-results
-		resolve-categories))
+		resolve-categories
+		write-results))

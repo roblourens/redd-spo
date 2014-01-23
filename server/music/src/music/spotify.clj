@@ -2,12 +2,27 @@
     (:require [music.util :as util])
     (:import [java.net URLEncoder]))
 
-(defn- filter-non-us [d]
-    "Filters non-US-allowed songs from the set of Spotify results"
-    (filter #(re-matches #".*US.*" (-> % :album :availability :territories)) d))
+(defn filter-non-us [result]
+    "Make a function that filters non-US-allowed songs from the set of Spotify results"
+    (re-find #"US" (-> result :album :availability :territories)))
 
-(defn- filter-karaoke-tribute [d]
-    "Filters karaoke, tribute")
+(defn- not-in-spotify-result-unless-in-query [s result q]
+    "True if regex re is not found in the spotify result, unless it is found in the query q."
+    (let [re (re-pattern (str "(?i)" s))]
+        (or 
+            (not (or 
+                    (re-find re (-> result :artists first :name))
+                    (re-find re (result :name))))
+            (re-find re q))))
+
+(defn- filterfn-karaoke-tribute [q]
+    "Make a function that is true if Spotify result does not violate karaoke, tribute to, etc. rules"
+    (fn [result]
+        (reduce
+            (fn [out s]
+                (and out (not-in-spotify-result-unless-in-query s result q)))
+            true
+            ["karaoke" "tribute to" "made famous by"])))
 
 (defn- clean-query [q]
         "Add spaces around '-' and remove some unneeded things"
@@ -21,7 +36,8 @@
     (-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
         util/get-json
         :tracks
-        filter-non-us
+        (util/arrowfilter filter-non-us)
+        (util/arrowfilter (filterfn-karaoke-tribute q))
         first))
 
 (defn- remove-between-regexes-transform [r1 r2 & [e]]
@@ -71,5 +87,5 @@
 (defn resolve-submission-title-to-id [q]
     "Resolves a submission title query to a Spotify item id"
     (map 
-        #(% :href)
+        #(:href %)
         (resolve-submission-title q)))

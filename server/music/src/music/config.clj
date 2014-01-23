@@ -2,7 +2,7 @@
 
 (def ^:const debug-logging true)
 
-(def mode "dev")
+(def ^:const mode "dev")
 
 (def aws-bucket-name
     (if (= mode "release")

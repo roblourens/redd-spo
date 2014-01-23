@@ -5,7 +5,7 @@
         [music.config :as config]))
 
 ; From http://www.learningclojure.com/2010/09/defn-vs-defmacro-what-is-macro-why-is.html
-(defmacro dbg[x] `(let [x# ~x] (log "dbg:" '~x "=" x#) x#))
+(defmacro dbg[x] `(let [x# ~x] (log (str "dbg:" '~x "=" x#)) x#))
 
 (defn log [m]
     (if config/debug-logging (println m)))
@@ -28,3 +28,7 @@
     (if (nil? s)
         s
         (clojure.string/lower-case s)))
+
+(defmacro not-nil? [x] `(not (nil? ~x)))
+
+(defmacro arrowfilter [coll pred] `(filter ~pred ~coll))
