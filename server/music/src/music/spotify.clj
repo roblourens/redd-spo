@@ -86,6 +86,4 @@
 
 (defn resolve-submission-title-to-id [q]
     "Resolves a submission title query to a Spotify item id"
-    (map 
-        #(:href %)
-        (resolve-submission-title q)))
+    (:href (resolve-submission-title q)))
