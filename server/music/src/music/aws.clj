@@ -18,6 +18,6 @@
     ; Set permissions on the object
     (s3/update-object-acl
         creds/cred
-        "rl-reddspo"
+        config/aws-bucket-name
         objectname
         (s3/grant :all-users :read)))
