@@ -5,8 +5,9 @@ require(
   (models,        Throbber) ->
     class Category
         constructor: (@id) ->
-            @timeRendered = 0;
-            @shown = false;
+            @timeRendered = 0
+            @rendering = false
+            @shown = false
 
             @element = $(document.createElement 'div')
             @element.addClass "category category-" + id
@@ -15,19 +16,8 @@ require(
             @shown = true
 
             p = new models.Promise()
-            if @needsRendering()
-                @element.empty()
-                @showLoading()
-                
-                Data.getCategoryJson(@id)
-                    .done (subreddits) =>
-                        @hideLoading()
-                        subreddits.forEach(@renderSubreddit)
-                        p.setDone()
-
-                        @timeRendered = Util.timeMs()
-                    .fail(->
-                        p.setFail('net'))
+            if @needsRendering() && !@rendering
+                @render(p)
             else
                 p.setDone()
 
@@ -38,6 +28,25 @@ require(
         hide: ->
             @element.hide()
             @shown = false
+
+        render: (p) ->
+            @rendering = true
+            @element.empty()
+            @showLoading()
+            
+            Data.getCategoryJson(@id)
+                .done (subreddits) =>
+                    try
+                        @hideLoading()
+                        subreddits.forEach(@renderSubreddit)
+                        @timeRendered = Util.timeMs()
+                    catch
+                    finally
+                        p.setDone()
+                .fail ->
+                    p.setFail('net')
+                .always ->
+                    @rendering = false
 
         showLoading: ->
             if !@throbber
