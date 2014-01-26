@@ -40,9 +40,9 @@ require(
                         promise.setDone(this)
 
                     # Set the sub list
-                    list = List.forPlaylist(playlist, { style: 'rounded' })
-                    list.init()
-                    @element.find(".list-wrapper").append(list.node))
+                    @list = List.forPlaylist(@playlist, { style: 'rounded', throbber: 'show-content' })
+                    @element.find(".list-wrapper").append(@list.node)
+                    @list.init())
 
             return promise
 
