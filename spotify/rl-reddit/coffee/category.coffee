@@ -45,7 +45,7 @@ require(
                         p.setDone()
                 .fail ->
                     p.setFail('net')
-                .always ->
+                .always =>
                     @rendering = false
 
         showLoading: ->
