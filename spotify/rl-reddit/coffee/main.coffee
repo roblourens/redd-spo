@@ -12,7 +12,7 @@ require(
         activeCategory.hide() if activeCategory?
 
     drawCurTab = ->
-        return unless models.session.online?
+        return unless models.session.online
 
         cleanUp()
 
