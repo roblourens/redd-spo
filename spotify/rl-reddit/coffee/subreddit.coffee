@@ -3,8 +3,10 @@
 require(
  ['$api/models', '$api/library#Library', '$views/list#List', '$views/image#Image', '$views/buttons#Button'],
   (models,        Library,                List,               Image,                Button) ->
-    class Subreddit
+    class Subreddit extends Container
         constructor: (data) ->
+            super
+
             # Build the subreddit HTML
             @element = $($.parseHTML(
                 "<div class='subreddit'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
@@ -20,7 +22,7 @@ require(
             @addButton.setIcon("res/add.png")
             @addButton.setAccentuated(true)
             @element.find('.subreddit-header').append(@addButton.node)
-            $(@addButton.node).click(@playlistButtonClicked.bind(this))
+            $(@addButton.node).click(@playlistButtonClicked)
 
         # Returns a promise
         init: ->
@@ -36,11 +38,12 @@ require(
                 (playlist) =>
                     @playlist = playlist
                     imageForTempPlaylist(playlist, @name).done this, (image) ->
-                        @element.find(".img-wrapper").append(image.node)
+                        @element.find(".img-wrapper").append image.node
                         promise.setDone(this)
 
                     # Set the sub list
                     @list = List.forPlaylist(@playlist, { style: 'rounded', throbber: 'show-content' })
+                    @children.push(@list)
                     @element.find(".list-wrapper").append(@list.node)
                     @list.init())
 
@@ -54,7 +57,12 @@ require(
                 @playlist.tracks.snapshot().done this, (snapshot) ->
                     Util.playlistWithTracks(@name, snapshot.toArray())
 
-        dispose: ->
+        destroy: ->
+            super
+
+            # Unbind listeners
+            $(@addButton.node).unbind('click', @playlistButtonClicked)
+
             # Sometimes this fails because it thinks the playlist is null
             try
                 return models.Playlist.removeTemporary(@playlist)

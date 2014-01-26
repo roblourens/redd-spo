@@ -8,7 +8,7 @@ require(
             @timeRendered = 0
             @rendering = false
             @shown = false
-
+            @subreddits = []
             @element = $(document.createElement 'div')
             @element.addClass "category category-" + id
 
@@ -31,14 +31,14 @@ require(
 
         render: (p) ->
             @rendering = true
-            @element.empty()
+            @removeAllSubreddits()
             @showLoading()
             
             Data.getCategoryJson(@id)
-                .done (subreddits) =>
+                .done (subredditDatas) =>
                     try
                         @hideLoading()
-                        subreddits.forEach(@renderSubreddit)
+                        subredditDatas.forEach(@renderSubreddit)
                         @timeRendered = Util.timeMs()
                     catch
                     finally
@@ -63,10 +63,18 @@ require(
             subreddit.init()
 
             if subreddit.tracks.length > 0
+                @subreddits.push(subreddit)
                 @element.append(subreddit.element)
 
+        removeAllSubreddits: ->
+            @subreddits.forEach (subreddit) ->
+                subreddit.element.remove()
+                subreddit.destroy()
+
+            @subreddits = []
+
         needsRendering: ->
-            return Util.timeMs() - @timeRendered > 30*60*1000 # 30 min
+            return Config.AlwaysRerender or (Util.timeMs() - @timeRendered > 30*60*1000) # 30 min
 
     RLViews.Category = Category
 )

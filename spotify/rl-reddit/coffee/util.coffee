@@ -26,3 +26,13 @@ require(
 
         return p
 )
+
+class Container
+    constructor: ->
+        @children = []
+
+    destroy: ->
+        child.destroy() for child in @children when child.destroy?
+        @children = []
+
+window.Container = Container
