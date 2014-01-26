@@ -17,11 +17,12 @@ require(
 
             p = new models.Promise()
             if @needsRendering() && !@rendering
+                @removeAllSubreddits()
+                @element.show()
                 @render(p)
             else
+                @element.show()
                 p.setDone()
-
-            @element.show()
 
             return p
 
@@ -31,7 +32,6 @@ require(
 
         render: (p) ->
             @rendering = true
-            @removeAllSubreddits()
             @showLoading()
             
             Data.getCategoryJson(@id)
@@ -49,14 +49,14 @@ require(
                     @rendering = false
 
         showLoading: ->
-            if !@throbber
-                @throbber = Throbber.forElement @element[0]
-                @throbber.setSize 'small'
-
+            # Apparently not meant to be reused - the size is always wrong the second time
+            @throbber = Throbber.forElement @element[0]
+            @throbber.setSize 'small'
             @throbber.show()
 
         hideLoading: ->
             @throbber.hide()
+            @throbber = null
 
         renderSubreddit: (subredditData) =>
             subreddit = new RLViews.Subreddit(subredditData)
