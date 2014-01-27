@@ -1,0 +1,53 @@
+.subreddit {
+    /* The container isn't sized to the image height for some reason. The bottom pad is basically controlled by min-height. */
+    min-height: 335px;
+    padding: 15px 25px 0px; 
+    background: url('../res/grid_noise.png');
+}
+
+.subreddit:nth-child(2n+1) {
+    background-color: #5f99cf;
+
+    /* The "inset" subreddit looks smaller than the one with the drop shadow, so make it 5px bigger top and bottom */
+    padding-top: 15px;
+    min-height: 340px;
+}
+
+.subreddit:nth-child(2n+1).hovered {
+    background-color: #5281AD;
+}
+
+.subreddit:nth-child(2n) {
+    background-color: #666;
+    box-shadow: 0px 0px 10px 2px #444;
+    position: relative;
+}
+
+.subreddit:nth-child(2n).hovered {
+    background-color: #555;
+}
+
+.subreddit-header {
+    margin-bottom: 10px;
+    margin-left: 50px;
+}
+
+.subreddit-header button {
+    float: right;
+    margin-top: 12px;
+}
+
+.img-wrapper {
+    float: left;
+    padding-right: 20px;
+    width: 250px;
+    height: 250px;
+}
+
+.list-wrapper {
+    min-height: 1px; /* When the list-wrapper doesn't take up space, there's a gap between subreddits before data is loaded */
+}
+
+.list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
+    height: 249px !important; /* Get rid of that weird shadow at the bottom */
+}

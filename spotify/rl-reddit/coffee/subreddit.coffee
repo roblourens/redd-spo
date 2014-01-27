@@ -24,13 +24,20 @@ require(
             @element.find('.subreddit-header').append(@addButton.node)
             $(@addButton.node).click(@playlistButtonClicked)
 
+            # Bind mouseenter/leave handlers
+            @element.mouseover @onMouseOver
+            @element.mouseout @onMouseOut
+            @element.find('.img-wrapper, .list-wrapper').mouseover (e) =>
+                e.stopPropagation()
+                @onMouseOut()
+
         # Returns a promise
         init: ->
             promise = new models.Promise()
             
             # Now entering callback hell
             trackUris = $.grep(@tracks, (uri) -> uri != null )
-            trackUris = trackUris.slice(0, 9) # Limit to 9 visible tracks
+            trackUris = trackUris.slice(0, 25) # Limit to 9 visible tracks
             tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track))
 
             Util.playlistWithTracks(@name.replace(/\//g, ''), tracks, true).done(
@@ -56,6 +63,13 @@ require(
                 @addButton.setDisabled(true)
                 @playlist.tracks.snapshot().done this, (snapshot) ->
                     Util.playlistWithTracks(@name, snapshot.toArray())
+
+        onMouseOver: (e) =>
+            console.log(e)
+            @element.addClass 'hovered'
+
+        onMouseOut: =>
+            @element.removeClass 'hovered'
 
         destroy: ->
             super

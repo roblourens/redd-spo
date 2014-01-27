@@ -40,7 +40,8 @@ require(
                         @hideLoading()
                         subredditDatas.forEach(@renderSubreddit)
                         @timeRendered = Util.timeMs()
-                    catch
+                    catch e
+                        console.log 'Category rendering failed: ' + e
                     finally
                         p.setDone()
                 .fail ->
