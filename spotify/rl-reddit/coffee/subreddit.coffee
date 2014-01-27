@@ -9,7 +9,7 @@ require(
 
             # Build the subreddit HTML
             @element = $($.parseHTML(
-                "<div class='subreddit'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
+                "<div class='subreddit collapsed'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
 
             @tracks = data.tracks || []
             @name = data.name
@@ -20,16 +20,15 @@ require(
             # Set up the Save as Playlist button
             @addButton = Button.withLabel("Save as Playlist")
             @addButton.setIcon("res/add.png")
+            $(@addButton.node).addClass('add-button')
             @addButton.setAccentuated(true)
             @element.find('.subreddit-header').append(@addButton.node)
             $(@addButton.node).click(@playlistButtonClicked)
 
-            # Bind mouseenter/leave handlers
-            @element.mouseover @onMouseOver
-            @element.mouseout @onMouseOut
-            @element.find('.img-wrapper, .list-wrapper').mouseover (e) =>
+            # Bind to a subreddit click and swallow clicks on some inner elements
+            @element.click @clicked
+            @element.find('.img-wrapper, .list-wrapper, .add-button').click (e) ->
                 e.stopPropagation()
-                @onMouseOut()
 
         # Returns a promise
         init: ->
@@ -56,7 +55,7 @@ require(
 
             return promise
 
-        playlistButtonClicked: ->
+        playlistButtonClicked: =>
             if @playlist
                 @addButton.setLabel('Saved as playlist')
                 @addButton.setIcon(null)
@@ -64,12 +63,9 @@ require(
                 @playlist.tracks.snapshot().done this, (snapshot) ->
                     Util.playlistWithTracks(@name, snapshot.toArray())
 
-        onMouseOver: (e) =>
-            console.log(e)
-            @element.addClass 'hovered'
-
-        onMouseOut: =>
-            @element.removeClass 'hovered'
+        clicked: =>
+            @element.toggleClass('collapsed')
+            Util.setNaturalSize(@element.find('.list-wrapper > div'), "height")
 
         destroy: ->
             super

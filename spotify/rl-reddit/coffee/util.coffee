@@ -36,3 +36,15 @@ class Container
         @children = []
 
 window.Container = Container
+
+# Inspired by http://css-tricks.com/snippets/jquery/animate-heightwidth-to-auto/
+Util.setNaturalSize = (el, prop) ->
+    elem = $(el).clone().css({"height":"auto","width":"auto"}).appendTo("body")
+    height = elem.css("height")
+    width = elem.css("width")
+    elem.remove()
+    
+    if prop == "height"
+        el.height(height)
+    else if prop == "width"
+        el.width(width)
