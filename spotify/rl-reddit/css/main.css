@@ -35,16 +35,8 @@ body {
     height: 50px;
 }
 
-#wrapper {
-}
-
 .category {
     height: 400px;
-}
-
-.subreddit-header {
-    margin-bottom: 10px;
-    margin-left: 50px;
 }
 
 .title {
@@ -52,47 +44,6 @@ body {
     text-shadow: 1px 1px 0px black;
     font-weight: bold;
     font-size: 2.9em;
-}
-
-.subreddit-header button {
-    float: right;
-    margin-top: 12px;
-}
-
-.img-wrapper {
-    float: left;
-    margin-right: 20px;
-    width: 250px;
-    height: 250px;
-}
-
-.subreddit {
-    /* The container isn't sized to the image height for some reason. The bottom pad is basically controlled by min-height. */
-    min-height: 335px;
-    padding: 15px 25px 0px; 
-    background: url('../res/grid_noise.png');
-}
-
-.subreddit:nth-child(2n+1) {
-    background-color: #5f99cf;
-
-    /* The "inset" subreddit looks smaller than the one with the drop shadow, so make it 5px bigger top and bottom */
-    padding-top: 15px;
-    min-height: 340px;
-}
-
-.subreddit:nth-child(2n) {
-    background-color: #777;
-    box-shadow: 0px 0px 10px 2px #444;
-    position: relative;
-}
-
-.list-wrapper {
-    min-height: 1px; /* When the list-wrapper doesn't take up space, there's a gap between subreddits before data is loaded */
-}
-
-.list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
-    height: 249px !important; /* Get rid of that weird shadow at the bottom */
 }
 
 #connectErrMsg {

@@ -1,0 +1,70 @@
+.subreddit {
+    padding: 15px 25px 30px; 
+    background: url('../res/grid_noise.png');
+    min-height: 354px;
+    box-sizing: border-box;
+}
+
+.subreddit:nth-child(2n+1) {
+    background-color: #5f99cf;
+
+    /* The "inset" subreddit looks smaller than the one with the drop shadow, so make it 5px bigger top and bottom */
+    padding-top: 20px;
+    padding-bottom: 35px;
+    min-height: 364px;
+}
+
+.subreddit .list-wrapper::after {
+    transition: opacity .5s ease-in-out;
+    opacity: 0;
+    content: '. . .';
+    text-align: center;
+    float: right;
+    font-size: 40px;
+    margin-top: -25px;
+    margin-right: 20px;
+    color: lightgray;
+    text-shadow: 1px 1px 0px #444;
+}
+
+.subreddit:hover .list-wrapper::after
+{
+    opacity: .8;
+}
+
+.subreddit:nth-child(2n) {
+    background-color: #666;
+    box-shadow: 0px 0px 10px 2px #444;
+    position: relative;
+}
+
+.subreddit-header {
+    margin-bottom: 10px;
+    margin-left: 50px;
+}
+
+.subreddit-header button {
+    float: right;
+    margin-top: 12px;
+}
+
+.img-wrapper {
+    float: left;
+    padding-right: 20px;
+    width: 250px;
+    height: 250px;
+}
+
+.list-wrapper {
+    min-height: 1px; /* When the list-wrapper doesn't take up space, there's a gap between subreddits before data is loaded */
+    margin-left: 270px; /* image w + pad */
+}
+
+.subreddit .list-wrapper > div
+{
+    transition: height .7s ease;
+}
+
+.subreddit.collapsed .list-wrapper > div { /* Don't use internal spotify classes, I don't trust them. */
+    height: 249px !important; /* Get rid of that weird shadow at the bottom */
+}
