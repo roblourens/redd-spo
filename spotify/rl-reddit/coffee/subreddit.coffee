@@ -3,11 +3,13 @@
 require(
  ['$api/models', '$api/library#Library', '$views/list#List', '$views/image#Image', '$views/buttons#Button'],
   (models,        Library,                List,               Image,                Button) ->
-    class Subreddit
+    class Subreddit extends Container
         constructor: (data) ->
+            super
+
             # Build the subreddit HTML
             @element = $($.parseHTML(
-                "<div class='subreddit'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
+                "<div class='subreddit collapsed'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
 
             @tracks = data.tracks || []
             @name = data.name
@@ -18,9 +20,15 @@ require(
             # Set up the Save as Playlist button
             @addButton = Button.withLabel("Save as Playlist")
             @addButton.setIcon("res/add.png")
+            $(@addButton.node).addClass('add-button')
             @addButton.setAccentuated(true)
             @element.find('.subreddit-header').append(@addButton.node)
-            $(@addButton.node).click(@playlistButtonClicked.bind(this))
+            $(@addButton.node).click(@playlistButtonClicked)
+
+            # Bind to a subreddit click and swallow clicks on some inner elements
+            @element.click @clicked
+            @element.find('.img-wrapper, .list-wrapper, .add-button').click (e) ->
+                e.stopPropagation()
 
         # Returns a promise
         init: ->
@@ -28,7 +36,7 @@ require(
             
             # Now entering callback hell
             trackUris = $.grep(@tracks, (uri) -> uri != null )
-            trackUris = trackUris.slice(0, 9) # Limit to 9 visible tracks
+            trackUris = trackUris.slice(0, 25) # Limit to 9 visible tracks
             tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track))
 
             Util.playlistWithTracks(@name.replace(/\//g, ''), tracks, true).done(
@@ -36,17 +44,18 @@ require(
                 (playlist) =>
                     @playlist = playlist
                     imageForTempPlaylist(playlist, @name).done this, (image) ->
-                        @element.find(".img-wrapper").append(image.node)
+                        @element.find(".img-wrapper").append image.node
                         promise.setDone(this)
 
                     # Set the sub list
-                    list = List.forPlaylist(playlist, { style: 'rounded' })
-                    list.init()
-                    @element.find(".list-wrapper").append(list.node))
+                    @list = List.forPlaylist(@playlist, { style: 'rounded', throbber: 'show-content' })
+                    @children.push(@list)
+                    @element.find(".list-wrapper").append(@list.node)
+                    @list.init())
 
             return promise
 
-        playlistButtonClicked: ->
+        playlistButtonClicked: =>
             if @playlist
                 @addButton.setLabel('Saved as playlist')
                 @addButton.setIcon(null)
@@ -54,7 +63,16 @@ require(
                 @playlist.tracks.snapshot().done this, (snapshot) ->
                     Util.playlistWithTracks(@name, snapshot.toArray())
 
-        dispose: ->
+        clicked: =>
+            @element.toggleClass('collapsed')
+            Util.setNaturalSize(@element.find('.list-wrapper > div'), "height")
+
+        destroy: ->
+            super
+
+            # Unbind listeners
+            $(@addButton.node).unbind('click', @playlistButtonClicked)
+
             # Sometimes this fails because it thinks the playlist is null
             try
                 return models.Playlist.removeTemporary(@playlist)

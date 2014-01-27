@@ -8,7 +8,7 @@ require(
             @timeRendered = 0
             @rendering = false
             @shown = false
-
+            @subreddits = []
             @element = $(document.createElement 'div')
             @element.addClass "category category-" + id
 
@@ -17,11 +17,12 @@ require(
 
             p = new models.Promise()
             if @needsRendering() && !@rendering
+                @removeAllSubreddits()
+                @element.show()
                 @render(p)
             else
+                @element.show()
                 p.setDone()
-
-            @element.show()
 
             return p
 
@@ -31,16 +32,16 @@ require(
 
         render: (p) ->
             @rendering = true
-            @element.empty()
             @showLoading()
             
             Data.getCategoryJson(@id)
-                .done (subreddits) =>
+                .done (subredditDatas) =>
                     try
                         @hideLoading()
-                        subreddits.forEach(@renderSubreddit)
+                        subredditDatas.forEach(@renderSubreddit)
                         @timeRendered = Util.timeMs()
-                    catch
+                    catch e
+                        console.log 'Category rendering failed: ' + e
                     finally
                         p.setDone()
                 .fail ->
@@ -49,24 +50,32 @@ require(
                     @rendering = false
 
         showLoading: ->
-            if !@throbber
-                @throbber = Throbber.forElement @element[0]
-                @throbber.setSize 'small'
-
+            # Apparently not meant to be reused - the size is always wrong the second time
+            @throbber = Throbber.forElement @element[0]
+            @throbber.setSize 'small'
             @throbber.show()
 
         hideLoading: ->
             @throbber.hide()
+            @throbber = null
 
         renderSubreddit: (subredditData) =>
             subreddit = new RLViews.Subreddit(subredditData)
             subreddit.init()
 
             if subreddit.tracks.length > 0
+                @subreddits.push(subreddit)
                 @element.append(subreddit.element)
 
+        removeAllSubreddits: ->
+            @subreddits.forEach (subreddit) ->
+                subreddit.element.remove()
+                subreddit.destroy()
+
+            @subreddits = []
+
         needsRendering: ->
-            return Util.timeMs() - @timeRendered > 30*60*1000 # 30 min
+            return Config.AlwaysRerender or (Util.timeMs() - @timeRendered > 30*60*1000) # 30 min
 
     RLViews.Category = Category
 )
