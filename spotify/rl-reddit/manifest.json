@@ -60,5 +60,5 @@
 	"SupportedLanguages": ["en"],
 	"VendorIdentifier": "com.robl",
 	"SupportedDeviceClasses": ["Desktop"],
-	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com"]
+	"RequiredPermissions": ["http://rl-reddspo.s3-website-us-east-1.amazonaws.com", ["https://ssl.google-analytics.com"]]
 }
