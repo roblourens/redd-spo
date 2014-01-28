@@ -14,8 +14,8 @@
     min-height: 364px;
 }
 
-.subreddit .list-wrapper::after {
-    transition: opacity .5s ease-in-out;
+.subreddit::after {
+    transition: opacity .6s ease;
     opacity: 0;
     content: '. . .';
     text-align: center;
@@ -27,7 +27,7 @@
     text-shadow: 1px 1px 0px #444;
 }
 
-.subreddit:hover .list-wrapper::after
+.subreddit:hover::after
 {
     opacity: .8;
 }
@@ -50,7 +50,7 @@
 
 .img-wrapper {
     float: left;
-    padding-right: 20px;
+    margin-right: 20px;
     width: 250px;
     height: 250px;
 }

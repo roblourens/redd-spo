@@ -9,10 +9,11 @@ require(
 
             # Build the subreddit HTML
             @element = $($.parseHTML(
-                "<div class='subreddit collapsed'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
+                "<div class='subreddit collapsed' data-appear-top-offset='400'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
 
             @tracks = data.tracks || []
             @name = data.name
+            @imageInitialized = false
 
             # Set the sub title
             @element.find('.title').text(@name)
@@ -43,15 +44,10 @@ require(
                 this,
                 (playlist) =>
                     @playlist = playlist
-                    imageForTempPlaylist(playlist, @name).done this, (image) ->
-                        @element.find(".img-wrapper").append image.node
-                        promise.setDone(this)
-
-                    # Set the sub list
-                    @list = List.forPlaylist(@playlist, { style: 'rounded', throbber: 'show-content' })
-                    @children.push(@list)
-                    @element.find(".list-wrapper").append(@list.node)
-                    @list.init())
+                    
+                    @element.appear().on('appear', @onElementVisible)
+                    if @element.is(':appeared')
+                        @onElementVisible())
 
             return promise
 
@@ -66,6 +62,22 @@ require(
         clicked: =>
             @element.toggleClass('collapsed')
             Util.setNaturalSize(@element.find('.list-wrapper > div'), "height")
+
+        onElementVisible: =>
+            @initImage() if !@imageInitialized
+            @initList() if !@listInitialized
+
+        initImage: ->
+            @imageInitialized = true
+            imageForTempPlaylist(@playlist, @name).done this, (image) ->
+                @element.find(".img-wrapper").append image.node
+
+        initList: ->
+            @listInitialized = true
+            @list = List.forPlaylist(@playlist, { style: 'rounded', throbber: 'show-content' })
+            @children.push(@list)
+            @element.find(".list-wrapper").append(@list.node)
+            @list.init()
 
         destroy: ->
             super
