@@ -3,7 +3,7 @@ window.Mode =
     Dev: "dev"
     Release: "rel"
 
-Config.CurrentMode = Mode.Dev
+Config.CurrentMode = Mode.Release
 Config.UrlBase =
     if Config.CurrentMode == Mode.Dev
     then "http://rl-reddspo-dev.s3-website-us-east-1.amazonaws.com/"
