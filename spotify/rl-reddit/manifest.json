@@ -13,7 +13,7 @@
 	},
 	"BundleIdentifier": "rl-reddit",
 	"BundleType": "Application",
-	"BundleVersion": "1.1.0",
+	"BundleVersion": "1.1.1",
 	"DefaultTabs": [
 		{
 			"arguments": "rm",
