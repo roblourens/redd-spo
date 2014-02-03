@@ -4,15 +4,16 @@
         [music.creds :as creds]
 
         [aws.sdk.s3 :as s3]
-        [clojure.data.json :as json]))
+        [clojure.tools.logging :as log]))
 
-(defn submit-object [objectname json-object]
-    ; Add the json stringify the object and send to s3 with correct content-type
+(defn write-object [objectname json-object]
+    (log/info (format "Writing %s to AWS" objectname))
+    ; json stringify the object and send to s3 with correct content-type
     (s3/put-object
         creds/cred
         config/aws-bucket-name
         objectname
-        (json/write-str json-object)
+        json-object
         {:content-type "application/json"})
 
     ; Set permissions on the object
