@@ -64,8 +64,8 @@
         ; Apply the transform - if it changed anything, search with it
         (let [q' ((first transforms) q)]
             (if (not= q q')
-                (if-let [results (do-search q')]
-                    results
+                (if-let [result (do-search q')]
+                    result
                     (continue q'))
                 (continue q')))
 
@@ -75,8 +75,7 @@
 (defn resolve-submission-title [q]
     "Resolves a submission title query to a Spotify result object"
     (log/info "Resolving title: " q)
-    (if-let [results (do-search q)]
-        results
+    (if-let [result (do-search q)]
         (try-transform-rec
             q
             [(remove-between-regexes-transform "\\[" "\\]")

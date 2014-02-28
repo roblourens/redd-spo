@@ -4,19 +4,17 @@ require(
  ['$api/models', '$api/library#Library', '$views/list#List', '$views/image#Image', '$views/buttons#Button'],
   (models,        Library,                List,               Image,                Button) ->
     class Subreddit extends Container
-        constructor: (data) ->
+        constructor: (@name) ->
             super
 
             # Build the subreddit HTML
             @element = $($.parseHTML(
                 "<div class='subreddit collapsed' data-appear-top-offset='400'><div class='subreddit-header'><span class='title' /></div><div class='img-wrapper' /><div class='list-wrapper'/></div>"))
 
-            @tracks = data.tracks || []
-            @name = data.name
             @imageInitialized = false
 
             # Set the sub title
-            @element.find('.title').text(@name)
+            @element.find('.title').text('/r/' + @name)
 
             # Set up the Save as Playlist button
             @addButton = Button.withLabel("Save as Playlist")
@@ -32,22 +30,32 @@ require(
                 e.stopPropagation()
 
         # Returns a promise
-        init: ->
+        render: ->
             promise = new models.Promise()
-            
-            # Now entering callback hell
-            trackUris = $.grep(@tracks, (uri) -> uri != null )
-            trackUris = trackUris.slice(0, 25) # Limit to 9 visible tracks
-            tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track))
 
-            Util.playlistWithTracks(@name.replace(/\//g, ''), tracks, true).done(
-                this,
-                (playlist) =>
-                    @playlist = playlist
-                    
-                    @element.appear().on('appear', @onElementVisible)
-                    if @element.is(':appeared')
-                        @onElementVisible())
+            # Now entering callback hell
+            Data.getSubredditData(@name).done((data) =>            
+                trackUris = $.grep(data.tracks, (uri) -> uri != null)
+                trackUris = trackUris.slice(0, 25) # Limit to 9 visible tracks
+                @tracks = $.map(trackUris, models.Track.fromURI.bind(models.Track))
+
+                if @tracks.length > 0
+                    @element.show()
+                else
+                    @element.remove()
+
+                Util.playlistWithTracks(@name.replace(/\//g, ''), @tracks, true).done(
+                    this,
+                    (playlist) =>
+                        @playlist = playlist
+                        
+                        @element.appear().on('appear', @onElementVisible)
+                        if @element.is(':appeared')
+                            @onElementVisible())
+
+            ).fail(=>
+                @element.remove()
+                promise.setFail())
 
             return promise
 
