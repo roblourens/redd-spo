@@ -34,11 +34,11 @@ require(
             @rendering = true
             @showLoading()
             
-            Data.getCategoryJson(@id)
-                .done (subredditDatas) =>
+            Data.getSubredditsForCategory(@id)
+                .done (subredditNames) =>
                     try
                         @hideLoading()
-                        subredditDatas.forEach(@renderSubreddit)
+                        subredditNames.forEach(@renderSubreddit)
                         @timeRendered = Util.timeMs()
                     catch e
                         console.log 'Category rendering failed: ' + e
@@ -59,13 +59,12 @@ require(
             @throbber.hide()
             @throbber = null
 
-        renderSubreddit: (subredditData) =>
-            subreddit = new RLViews.Subreddit(subredditData)
-            subreddit.init()
+        renderSubreddit: (subredditName) =>
+            subreddit = new RLViews.Subreddit(subredditName)
+            subreddit.render()
 
-            if subreddit.tracks.length > 0
-                @subreddits.push(subreddit)
-                @element.append(subreddit.element)
+            @subreddits.push(subreddit)
+            @element.append(subreddit.element)
 
         removeAllSubreddits: ->
             @subreddits.forEach (subreddit) ->

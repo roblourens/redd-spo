@@ -4,48 +4,55 @@
 		[music.util :as util]
 		[music.spotify :as spotify]
 		[music.aws :as aws]
-		[music.reddit :as reddit])
+		[music.reddit :as reddit]
+
+        [clojure.data.json :as json]
+		[clojure.tools.logging :as log])
   (:use [clojure.contrib.core :only (-?>)]))
 
 (set! *warn-on-reflection* true)
 
-(defn clean-results [subreddits]
+(defn- extract-sp-uris [subreddit]
 	"Turn a lot of data into just the necessary Spotify URIs"
-	(defn extract-sp-uris [subreddit]
-		(assoc subreddit :tracks
-			; Extract sp-uri values from the track map and filter out nils
-			(filter #(not (nil? %)) 
-				(map #(% :sp-uri) (subreddit :tracks)))))
-	(map extract-sp-uris subreddits))
+	(assoc subreddit :tracks
+		; Extract sp-uri values from the track map and filter out nils
+		(filter #(not (nil? %))
+			(map #(% :sp-uri) (subreddit :tracks)))))
 
-(defn write-results [results]
+(defn- write-subreddit [subreddit]
 	"results are {:rm [list of subreddit data ...] ...}"
-	(doseq [[cat subreddits] results]
-		(let [objectname (str (name cat) ".json")
-			  dbgobjectname (str "dbg-" objectname)]
-			(aws/submit-object dbgobjectname subreddits)
-			(aws/submit-object objectname (clean-results subreddits)))))
+	(let [subreddit-name (subreddit :name)
+		  objectpath (format "data/%s.json" subreddit-name)
+		  dbgobjectpath (format "debug/%s.json" subreddit-name)]
+		(aws/write-json-str dbgobjectpath (json/write-str subreddit))
+		(aws/write-json-str objectpath (json/write-str (extract-sp-uris subreddit)))))
 
-(defn resolve-submission [submission]
-	"Resolves a Reddit submission object to a Spotify id"
-	(assoc submission :sp-uri (spotify/resolve-submission-title-to-id (submission :title))))
+(defn- resolve-submission [submission]
+	"Resolves a Reddit submission object by adding a key :sp-uri"
+	(log/trace "resolve-submission" (submission :title))
+	(let [newSubmission (assoc submission :sp-uri (spotify/resolve-submission-title-to-id (submission :title)))]
+		(log/trace "end resolve-submission" (submission :title))
+		newSubmission))
 
-(defn resolve-subreddit [name]
-	"Resolves the subreddit name to subreddit data ({:name altrock :tracks [...]})"
-	(println "resolve-subreddit " name)
-	{:name (str "/r/" name)
-	 :tracks (map resolve-submission (reddit/get-submissions name))})
+(defn- resolve-subreddit [sr-name]
+	"Resolves the subreddit name to subreddit data {:name altrock :tracks [...]}"
+	{:name sr-name
+	 :tracks (doall (pmap resolve-submission (reddit/get-submissions sr-name)))})
 
-(defn resolve-subreddit-list [l]
-	"Resolve a subreddit list ([altrock ...]) to a list of subreddit data"
-	(map resolve-subreddit l))
-
-(defn resolve-categories [category-map]
-	(util/map-vals resolve-subreddit-list category-map))
+(defn- resolve-write-subreddit [sr-name]
+	(log/trace "resolve-write-subreddit" sr-name)
+	(write-subreddit (resolve-subreddit sr-name))
+	(log/trace "end resolve-subreddit" sr-name))
 
 (defn -main [& args]
-	"Do the things."
-	(-> "subreddits.json"
-		util/json-from-file
-		resolve-categories
-		write-results))
+	; Send the categories file to AWS
+	(let [categories-filename "categories.json"
+		  file-contents (slurp categories-filename)]
+		(aws/write-json-str categories-filename file-contents))
+
+	; Read a flat list of subreddits. Resolve all of them. 
+	; Investigate parallelizing this. Using pmap here results in lots of nulls from spotify/ for some reason.
+	(doall (map resolve-write-subreddit
+		(util/json-from-file "subreddits-flat.json")))
+
+	(shutdown-agents))

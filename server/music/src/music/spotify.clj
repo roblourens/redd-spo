@@ -1,5 +1,7 @@
 (ns music.spotify
-    (:require [music.util :as util])
+    (:require
+        [music.util :as util]
+        [clojure.tools.logging :as log])
     (:import [java.net URLEncoder]))
 
 (defn filter-non-us [result]
@@ -32,7 +34,6 @@
             (clojure.string/replace #" feat\.?| ft\.?| &amp;|:" "")))
 
 (defn- do-search [q]
-    (util/log (str "searching for " q))
     (-> (str "http://ws.spotify.com/search/1/track.json?q=" (URLEncoder/encode (clean-query q) "UTF-8"))
         util/get-json
         :tracks
@@ -63,8 +64,8 @@
         ; Apply the transform - if it changed anything, search with it
         (let [q' ((first transforms) q)]
             (if (not= q q')
-                (if-let [results (do-search q')]
-                    results
+                (if-let [result (do-search q')]
+                    result
                     (continue q'))
                 (continue q')))
 
@@ -73,8 +74,8 @@
 
 (defn resolve-submission-title [q]
     "Resolves a submission title query to a Spotify result object"
-    (if-let [results (do-search q)]
-        results
+    (log/info "Resolving title: " q)
+    (if-let [result (do-search q)]
         (try-transform-rec
             q
             [(remove-between-regexes-transform "\\[" "\\]")
