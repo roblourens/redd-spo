@@ -76,6 +76,7 @@
     "Resolves a submission title query to a Spotify result object"
     (log/info "Resolving title: " q)
     (if-let [result (do-search q)]
+        result
         (try-transform-rec
             q
             [(remove-between-regexes-transform "\\[" "\\]")
