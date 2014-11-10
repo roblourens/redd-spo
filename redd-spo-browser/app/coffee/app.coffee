@@ -1,0 +1,1 @@
+ReddSpoBrowser = window.ReddSpoBrowser = Ember.Application.create()
